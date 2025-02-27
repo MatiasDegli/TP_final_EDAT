@@ -10,7 +10,9 @@ public class GrafoEtiquetado {
     }
     
 
-    
+    public Object obtenerIgual(Object){
+
+    }
 
     
     public boolean insertarVertice(Object nuevoVertice){

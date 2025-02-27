@@ -22,7 +22,7 @@ public class CopaAmerica2024 {
         AVL equipos = new AVL();
         MapeoAMuchos partidos = new MapeoAMuchos();
         Lista colCiudades = new Lista();
-        //Lista colEquipos = new Lista();
+        Lista colEquipos = new Lista();
 
         String texto = "CopaAmerica2024.txt";
 
@@ -131,7 +131,7 @@ public class CopaAmerica2024 {
         int i = 0;
 
         String c1 = datos[1];
-        String c2 = datos[2];
+        String c2 = datos[2]; 
         int mins = Integer.parseInt(datos[3]);
         Ciudad origen = null, destino = null;
 
