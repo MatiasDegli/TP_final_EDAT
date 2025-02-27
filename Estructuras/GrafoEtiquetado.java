@@ -9,12 +9,6 @@ public class GrafoEtiquetado {
         inicio = null;
     }
     
-
-    public Object obtenerIgual(Object){
-
-    }
-
-    
     public boolean insertarVertice(Object nuevoVertice){
         
         boolean exito=false;
@@ -293,6 +287,8 @@ public class GrafoEtiquetado {
     
     
     public Lista caminoMasCorto(Object elemOrigen, Object elemDestino) {
+        //Devuelve una lista del camino de menor cantidad de nodos desde un nodo A a un nodo B 
+
         Lista actual = new Lista(), corto = new Lista();
         NodoVert origen = ubicarVertice(elemOrigen);
         actual.insertar(1, elemOrigen);
@@ -537,5 +533,28 @@ public class GrafoEtiquetado {
         
         return msj;
     }
+    
+    // ----------------------- METODOS PARA LAS CIUDADES ------------------------
+
+    public Object obtenerIgual(Object buscado){
+        NodoVert aux = inicio;
         
+        Comparable elem = (Comparable) aux.getElem();
+
+        while(aux!=null && elem.compareTo(buscado)!=0){
+            aux=aux.getSigVertice();
+            elem = (Comparable) aux.getElem();
+        }
+
+        if(aux==null){
+            elem=null;
+        }
+        
+        return elem;
+    }
+
+    public Lista caminoMenorTiempo(Ciudad origen, Ciudad destino){
+
+    }
+
 }

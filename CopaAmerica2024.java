@@ -57,7 +57,7 @@ public class CopaAmerica2024 {
                 } else if (datosLinea[0].equals("C")) {
                     cargarCiudad(datosLinea, ciudades, colCiudades);
                 } else if (datosLinea[0].equals("R")) {
-                    cargarRuta(datosLinea, ciudades, colCiudades);
+                    cargarRuta(datosLinea, ciudades);
                 }
             }
         }
@@ -102,20 +102,18 @@ public class CopaAmerica2024 {
 
         equipo1 = (Equipo) equipos.obtenerIgual(equipo1);
         equipo2 = (Equipo) equipos.obtenerIgual(equipo2);
-        
+
         equipo1.sumarGoles(gol1);
         equipo1.sumarEnContra(gol2);
         equipo2.sumarGoles(gol2);
         equipo2.sumarEnContra(gol1);
 
-        if(ins.equals("GRUPO")){
-            if(gol1>gol2){
+        if (ins.equals("GRUPO")) {
+            if (gol1 > gol2) {
                 equipo1.sumarPuntos(3);
-            }
-            else if(gol2>gol1){
+            } else if (gol2 > gol1) {
                 equipo2.sumarPuntos(3);
-            }
-            else{
+            } else {
                 equipo1.sumarPuntos(1);
                 equipo2.sumarPuntos(1);
             }
@@ -127,23 +125,13 @@ public class CopaAmerica2024 {
         partidos.asociar(key, partido);
     }
 
-    public static void cargarRuta(String[] datos, GrafoEtiquetado ciudades, Lista colCiudades) {
-        int i = 0;
-
+    public static void cargarRuta(String[] datos, GrafoEtiquetado ciudades) {
         String c1 = datos[1];
-        String c2 = datos[2]; 
+        String c2 = datos[2];
         int mins = Integer.parseInt(datos[3]);
-        Ciudad origen = null, destino = null;
 
-        while (origen == null || destino == null) {
-            Ciudad ciudad = (Ciudad) colCiudades.recuperar(i);
-            if (ciudad.getNombre().equals(c1)) {
-                origen = ciudad;
-            } else if (ciudad.getNombre().equals(c2)) {
-                destino = ciudad;
-            }
-            i++;
-        }
+        Ciudad origen = (Ciudad) ciudades.obtenerIgual(new Ciudad(c1, false, false));
+        Ciudad destino = (Ciudad) ciudades.obtenerIgual(new Ciudad(c2, false, false));
 
         ciudades.insertarArco(origen, destino, mins);
     }
@@ -408,10 +396,9 @@ public class CopaAmerica2024 {
         Equipo equipo = new Equipo(nombre, "xx", 'X');
         equipo = (Equipo) equipos.obtenerIgual(equipo);
 
-        if(equipo != null){
+        if (equipo != null) {
             System.out.println(equipo.datos());
-        }
-        else{
+        } else {
             System.out.println("El equipo ingresado no es parte del fixture");
         }
     }
@@ -435,20 +422,71 @@ public class CopaAmerica2024 {
         System.out.println(equipos.listarRango(piso, techo).toString());
     }
 
-    public static void resultados() {
+    public static void resultados(MapeoAMuchos partidos) {
         /*
          * Dados 2 equipos, si jugaron algún partido entre sí, mostrar los resultados.
          */
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el primer equipo");
+        String eq1 = scanner.nextLine();
+        System.out.println("Ingrese el segundo equipo");
+        String eq2 = scanner.nextLine();
+        
+        if(eq1.compareTo(eq2)>0){
+            String aux = eq1;
+            eq1=eq2;
+            eq2=aux;
+        }
+        
+        if(eq1.compareTo(eq2)==0){
+            System.out.println();
+        }
+        else{
+            PartidoKey dominio = new PartidoKey(eq1, eq2);
+            
+            if(partidos.pertenece(dominio)){
+                System.out.println(partidos.obtenerValor(dominio));
+            }
+        }
     }
 
-    public static void menorEscala() {
+    public static void menorEscala(GrafoEtiquetado ciudades) {
         /*
-         * Dados 2 equipos, si jugaron algún partido entre sí, mostrar los resultados.
+         * Obtener el camino que llegue de A a B pasando por la mínima cantidad de ciudades
          */
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nombre de la ciudad origen");
+        String c1 = scanner.nextLine();
+        System.out.println("Ingrese el nombre de la ciudad destino");
+        String c2 = scanner.nextLine();
+
+        Ciudad origen = new Ciudad(c1, false, false);
+        Ciudad destino = new Ciudad(c2, false, false);
+
+        origen = (Ciudad) ciudades.obtenerIgual(origen);
+        destino = (Ciudad) ciudades.obtenerIgual(destino);
+
+        ciudades.caminoMasCorto(origen, destino);
     }
 
-    public static void menorTiempo() {
+    public static void menorTiempo(GrafoEtiquetado ciudades) {
         /* Obtener el camino que llegue de A a B de menor tiempo */
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nombre de la ciudad origen");
+        String c1 = scanner.nextLine();
+        System.out.println("Ingrese el nombre de la ciudad destino");
+        String c2 = scanner.nextLine();
+
+        Ciudad origen = new Ciudad(c1, false, false);
+        Ciudad destino = new Ciudad(c2, false, false);
+
+        origen = (Ciudad) ciudades.obtenerIgual(origen);
+        destino = (Ciudad) ciudades.obtenerIgual(destino);
+
+        ciudades.caminoMenorTiempo(origen, destino);
     }
 
     public static void menorTiempoAlt() {
