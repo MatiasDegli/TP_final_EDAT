@@ -465,9 +465,6 @@ public class CopaAmerica2024 {
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
 
-        origen = (Ciudad) ciudades.obtenerIgual(origen);
-        destino = (Ciudad) ciudades.obtenerIgual(destino);
-
         System.out.println(ciudades.caminoMasCorto(origen, destino).toString());
     }
 
@@ -483,17 +480,28 @@ public class CopaAmerica2024 {
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
 
-        origen = (Ciudad) ciudades.obtenerIgual(origen);
-        destino = (Ciudad) ciudades.obtenerIgual(destino);
-
         System.out.println(ciudades.caminoMenorTiempo(origen, destino).toString());
     }
 
-    public static void menorTiempoAlt() {
+    public static void menorTiempoAlt(GrafoEtiquetado ciudades) {
         /*
          * El camino más corto en minutos de vuelo para llegar de A a B y que no pase
          * por una ciudad C dada
          */
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese el nombre de la ciudad origen");
+        String c1 = scanner.nextLine();
+        System.out.println("Ingrese el nombre de la ciudad destino");
+        String c2 = scanner.nextLine();
+        System.out.println("Ingrese el nombre de la ciudad a evitar");
+        String c3 = scanner.nextLine();
+
+        Ciudad origen = new Ciudad(c1, false, false);
+        Ciudad destino = new Ciudad(c2, false, false);
+        Ciudad evitar = new Ciudad(c3, false, false);
+
+        System.out.println(ciudades.caminoRapidoAlt(origen, destino, evitar).toString());
     }
 
     public static void caminosCompleto() {
@@ -503,6 +511,9 @@ public class CopaAmerica2024 {
          * posibilidad de conseguir alojamiento en la ciudad destino o en alguna ciudad
          * por la que tenga que pasar camino a ella
          */
+        Scanner scanner = new Scanner(System.in);
+
+        
     }
 
     public static void listaGoles() {

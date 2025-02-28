@@ -500,21 +500,19 @@ public class GrafoEtiquetado {
 
     // ----------------------- METODOS PARA LAS CIUDADES ------------------------
 
-    public Object obtenerIgual(Object buscado) {
+    private NodoVert ubicarCiudad(Ciudad ciudad) {
         NodoVert aux = inicio;
 
-        Comparable elem = (Comparable) aux.getElem();
+        if (aux != null) {
+            Ciudad ciudadActual = (Ciudad) aux.getElem();
 
-        while (aux != null && elem.compareTo(buscado) != 0) {
-            aux = aux.getSigVertice();
-            elem = (Comparable) aux.getElem();
+            while (aux != null && ciudadActual.compareTo(ciudad) != 0) {
+                aux = aux.getSigVertice();
+                ciudadActual = (Ciudad) aux.getElem();
+            }
         }
 
-        if (aux == null) {
-            elem = null;
-        }
-
-        return elem;
+        return aux;
     }
 
     public Lista caminoMenorTiempo(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
@@ -561,9 +559,9 @@ public class GrafoEtiquetado {
 
     public Lista caminoRapidoAlt(Ciudad ciudadOrigen, Ciudad ciudadDestino, Ciudad ciudadEvitar) {
         Lista actual = new Lista(), rapida = new Lista();
-        NodoVert origen = ubicarVertice(ciudadOrigen);
-        NodoVert destino = ubicarVertice(ciudadDestino);
-        NodoVert evitar = ubicarVertice(ciudadEvitar);
+        NodoVert origen = ubicarCiudad(ciudadOrigen);
+        NodoVert destino = ubicarCiudad(ciudadDestino);
+        NodoVert evitar = ubicarCiudad(ciudadEvitar);
         int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
         actual.insertar(1, origen);
 
@@ -582,7 +580,7 @@ public class GrafoEtiquetado {
                     rapida.vaciar();
                     llenar(rapida, actual);
                     tiempoMenor[0] = tiempoActual;
-                    //tiempoActual = 0;
+                    // tiempoActual = 0;
                 }
             } else {
                 NodoAdy adyacente = origen.getPrimerAdy();
