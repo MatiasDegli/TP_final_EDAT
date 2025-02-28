@@ -468,7 +468,7 @@ public class CopaAmerica2024 {
         origen = (Ciudad) ciudades.obtenerIgual(origen);
         destino = (Ciudad) ciudades.obtenerIgual(destino);
 
-        ciudades.caminoMasCorto(origen, destino);
+        System.out.println(ciudades.caminoMasCorto(origen, destino).toString());
     }
 
     public static void menorTiempo(GrafoEtiquetado ciudades) {
@@ -486,7 +486,7 @@ public class CopaAmerica2024 {
         origen = (Ciudad) ciudades.obtenerIgual(origen);
         destino = (Ciudad) ciudades.obtenerIgual(destino);
 
-        ciudades.caminoMenorTiempo(origen, destino);
+        System.out.println(ciudades.caminoMenorTiempo(origen, destino).toString());
     }
 
     public static void menorTiempoAlt() {
