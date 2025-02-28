@@ -605,4 +605,37 @@ public class GrafoEtiquetado {
         }
     }
 
+    public Lista caminosTotales(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
+        Lista caminos = new Lista(), actual = new Lista();
+        NodoVert origen = ubicarVertice(ciudadOrigen);
+        NodoVert destino = ubicarVertice(ciudadDestino);
+        actual.insertar(1, origen);
+
+        totalesAux(origen, destino, caminos, actual);
+
+        return caminos;
+    }
+
+    private void totalesAux(NodoVert origen, NodoVert destino, Lista caminos, Lista actual) {
+
+        if (origen != null) {
+            if (origen.equals(destino)) {
+                caminos.insertar(caminos.longitud()+1, actual.clone());                
+            } else {
+                NodoAdy adyacente = origen.getPrimerAdy();
+
+                while (adyacente != null) {
+                    NodoVert siguienteVertice = adyacente.getVertice();
+
+                    if (actual.localizar(siguienteVertice.getElem()) == -1) {
+                        // La ciudad no esta en la lista de ciudades visitadas
+                        actual.insertar(actual.longitud() + 1, siguienteVertice);
+                        totalesAux(siguienteVertice, destino, caminos, actual);
+                        actual.eliminar(actual.longitud());
+                    }
+                    adyacente = adyacente.getSigAdyacente();
+                }
+            }
+        }
+    }
 }

@@ -504,7 +504,7 @@ public class CopaAmerica2024 {
         System.out.println(ciudades.caminoRapidoAlt(origen, destino, evitar).toString());
     }
 
-    public static void caminosCompleto() {
+    public static void caminosCompleto(GrafoEtiquetado ciudades) {
         /*
          * Obtener todos los caminos posibles para llegar de A a B, mostrarlos y luego
          * filtrar y mostrar solo los que haya
@@ -513,6 +513,15 @@ public class CopaAmerica2024 {
          */
         Scanner scanner = new Scanner(System.in);
 
+        System.out.println("Ingrese el nombre de la ciudad origen");
+        String c1 = scanner.nextLine();
+        System.out.println("Ingrese el nombre de la ciudad destino");
+        String c2 = scanner.nextLine();
+
+        Ciudad origen = new Ciudad(c1, false, false);
+        Ciudad destino = new Ciudad(c2, false, false);
+
+        System.out.println(ciudades.caminoMenorTiempo(origen, destino).toString());
         
     }
 
