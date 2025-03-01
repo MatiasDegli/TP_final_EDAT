@@ -9,6 +9,7 @@ import Estructuras.Lista;
 import Estructuras.MapeoAMuchos;
 import TDAs.Ciudad;
 import TDAs.Equipo;
+import TDAs.EquipoGoles;
 import TDAs.Partido;
 import TDAs.PartidoKey;
 
@@ -130,8 +131,8 @@ public class CopaAmerica2024 {
         String c2 = datos[2];
         int mins = Integer.parseInt(datos[3]);
 
-        Ciudad origen = (Ciudad) ciudades.obtenerIgual(new Ciudad(c1, false, false));
-        Ciudad destino = (Ciudad) ciudades.obtenerIgual(new Ciudad(c2, false, false));
+        Ciudad origen = (Ciudad) ciudades.obtenerCiudad(new Ciudad(c1, false, false));
+        Ciudad destino = (Ciudad) ciudades.obtenerCiudad(new Ciudad(c2, false, false));
 
         ciudades.insertarArco(origen, destino, mins);
     }
@@ -432,20 +433,19 @@ public class CopaAmerica2024 {
         String eq1 = scanner.nextLine();
         System.out.println("Ingrese el segundo equipo");
         String eq2 = scanner.nextLine();
-        
-        if(eq1.compareTo(eq2)>0){
+
+        if (eq1.compareTo(eq2) > 0) {
             String aux = eq1;
-            eq1=eq2;
-            eq2=aux;
+            eq1 = eq2;
+            eq2 = aux;
         }
-        
-        if(eq1.compareTo(eq2)==0){
+
+        if (eq1.compareTo(eq2) == 0) {
             System.out.println();
-        }
-        else{
+        } else {
             PartidoKey dominio = new PartidoKey(eq1, eq2);
-            
-            if(partidos.pertenece(dominio)){
+
+            if (partidos.pertenece(dominio)) {
                 System.out.println(partidos.obtenerValor(dominio));
             }
         }
@@ -453,7 +453,8 @@ public class CopaAmerica2024 {
 
     public static void menorEscala(GrafoEtiquetado ciudades) {
         /*
-         * Obtener el camino que llegue de A a B pasando por la mínima cantidad de ciudades
+         * Obtener el camino que llegue de A a B pasando por la mínima cantidad de
+         * ciudades
          */
         Scanner scanner = new Scanner(System.in);
 
@@ -521,21 +522,60 @@ public class CopaAmerica2024 {
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
 
-        System.out.println(ciudades.caminoMenorTiempo(origen, destino).toString());
-        
+        Lista caminos = ciudades.caminoMenorTiempo(origen, destino);
+
+        System.out.println("Todos los caminos posibles desde " + c1 + " hasta " + c2 + ", son: ");
+
+        Lista conAlojamiento = new Lista();
+
+        for (int i = 0; i < caminos.longitud(); i++) {
+            Lista camino = (Lista) caminos.recuperar(i);
+            System.out.println(camino.toString());
+
+            if (camino.tieneAlojamiento()) {
+                conAlojamiento.insertar(conAlojamiento.longitud() + 1, camino);
+            }
+        }
+
+        if (conAlojamiento.esVacia()) {
+            System.out.println("No hay ningun camino con alojamiento disponible");
+        } else {
+            System.out.println("Los caminos que tienen alojamiento son: ");
+
+            for (int i = 0; i < conAlojamiento.longitud(); i++) {
+                Lista camino = (Lista) conAlojamiento.recuperar(i);
+                System.out.println(camino.toString());
+            }
+        }
     }
 
-    public static void listaGoles() {
+    public static void listaGoles(AVL equipos) {
+        Lista listaEquipos = equipos.listar();
+        AVL equiposPorGol = new AVL();
 
+        for (int i = 0; i < listaEquipos.longitud(); i++) {
+            EquipoGoles equipo = new EquipoGoles((Equipo) listaEquipos.recuperar(i));
+            equiposPorGol.insertar(equipo);
+        }
+
+        System.out.println("La lista de los equipos en orden de mas cantidad de goles a favor a menor es: "
+                + equiposPorGol.toString());
+        equiposPorGol.vaciar();
+        listaEquipos.vaciar();
     }
 
-    public static void mostrarSistema() {
+    public static void mostrarSistema(GrafoEtiquetado ciudades, AVL equipos, MapeoAMuchos partidos) {
         /*
          * Mostrar sistema: es una operación de debugging que permite ver todas las
          * estructuras utilizadas con su contenido
          * (grafo, AVL y Mapeo) para verificar, en cualquier momento de la ejecución del
          * sistema, que se encuentren cargadas correctamente.
          */
+
+        System.out.println("Grafo de ciudades: " + ciudades.toString());
+        System.out.println("AVL de equipos: " + equipos.toString());
+        System.out.println("Mapeo de partidos: " + partidos.toString());
+        
     }
 
 }

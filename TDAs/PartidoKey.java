@@ -8,4 +8,8 @@ public class PartidoKey {
         eq1=e1;
         eq2=e2;
     }
+
+    public String toString(){
+        return "Equipo 1: "+eq1+" - Equipo 2: "+eq2;
+    }
 }

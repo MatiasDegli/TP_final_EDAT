@@ -16,6 +16,10 @@ public class Ciudad implements Comparable {
         return nombre;
     }
 
+    public boolean getDisponibilidad(){
+        return disponibilidad;
+    }
+
     public void setDisponibilidad(boolean dis) {
         disponibilidad = dis;
     }

@@ -15,4 +15,8 @@ public class Partido {
         golesEq1=gol1;
         golesEq2=gol2;
     }
+
+    public String toString(){
+        return "Instancia: "+instancia+" --> Resultado: "+golesEq1+ " - "+golesEq2;
+    }
 }

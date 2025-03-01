@@ -1,215 +1,204 @@
 package Estructuras;
 
+import TDAs.PartidoKey;
+
 public class MapeoAMuchos {
-    
-    private int TAM=100;
-    private int cant=0;
+
+    private int TAM = 20;
+    private int cant = 0;
     private NodoHashMapeoM[] tabla = new NodoHashMapeoM[TAM];
-    
-    
-    public void MapeoAMuchos(){
-        
+
+    public void MapeoAMuchos() {
+
     }
-    
-    
+
     private int hash(Object valorDominio) {
         // Implementa aquí tu propio algoritmo de hash
-        // Este es un ejemplo simple que convierte el objeto a una cadena y calcula el hash
+        // Este es un ejemplo simple que convierte el objeto a una cadena y calcula el
+        // hash
         return Math.abs(valorDominio.toString().hashCode()) % TAM;
     }
-    
-    
-    public boolean asociar(Object valorDominio, Object valorRango){
+
+    public boolean asociar(Object valorDominio, Object valorRango) {
         boolean exito = false;
-        
+
         int pos = hash(valorDominio);
-        
+
         NodoHashMapeoM aux = tabla[pos];
-        
-        if(aux!=null){  
-            while(aux!=null && !aux.getDominio().equals(valorDominio)){
-                aux=aux.getEnlace();
+
+        if (aux != null) {
+            while (aux != null && !aux.getDominio().equals(valorDominio)) {
+                aux = aux.getEnlace();
             }
-            if(aux!=null){
-                Lista listaRango=aux.getRango();
-                listaRango.insertar(listaRango.longitud()+1, valorRango);
-                exito=true;
+            if (aux != null) {
+                Lista listaRango = aux.getRango();
+                listaRango.insertar(listaRango.longitud() + 1, valorRango);
+                exito = true;
             }
         }
-        
+
         return exito;
     }
-    
-    
-    public boolean desasociar(Object valorDominio, Object valorRango){
-        boolean exito = false; 
-        
+
+    public boolean desasociar(Object valorDominio, Object valorRango) {
+        boolean exito = false;
+
         int pos = hash(valorDominio);
-        
-        NodoHashMapeoM aux = tabla[pos];        
-        
-        if(aux!=null){
+
+        NodoHashMapeoM aux = tabla[pos];
+
+        if (aux != null) {
             // La tabla tiene uno o más elementos en la posicion pos
-            while(aux.getEnlace()!=null && aux.getDominio().equals(valorDominio)){                
-                aux=aux.getEnlace();
+            while (aux.getEnlace() != null && aux.getDominio().equals(valorDominio)) {
+                aux = aux.getEnlace();
             }
-            if(aux!=null){
+            if (aux != null) {
                 // Encontró el dominio
                 Lista rango = aux.getRango();
                 exito = rango.eliminarAparicion(valorRango);
-                // Elimina el valor en la lista si lo encuentra                
+                // Elimina el valor en la lista si lo encuentra
             }
         }
-        
+
         return exito;
     }
-    
-    
-    public Lista obtenerValor(Object valorDominio){
+
+    public Lista obtenerValor(Object valorDominio) {
         Lista rango = new Lista();
-        
+
         int pos = hash(valorDominio);
-        
+
         NodoHashMapeoM aux = tabla[pos];
-        
-        while(aux!=null && !aux.getDominio().equals(valorDominio)){
-            aux=aux.getEnlace();            
+
+        while (aux != null && !aux.getDominio().equals(valorDominio)) {
+            aux = aux.getEnlace();
         }
-        if(aux!=null){
+        if (aux != null) {
             rango.pasarElementos(rango, aux.getRango());
         }
-        
+
         return rango;
     }
-    
-    
-    public Lista obtenerConjuntoDominio(){
+
+    public Lista obtenerConjuntoDominio() {
         Lista dominio = new Lista();
-        
-        if(cant>0){
+
+        if (cant > 0) {
             for (int i = 0; i < TAM; i++) {
-                
-                if(tabla[i]!=null){
-                    dominio.insertar(dominio.longitud()+1, tabla[i].getDominio());
-                    
-                    if(tabla[i].getEnlace()!=null){
+
+                if (tabla[i] != null) {
+                    dominio.insertar(dominio.longitud() + 1, tabla[i].getDominio());
+
+                    if (tabla[i].getEnlace() != null) {
                         NodoHashMapeoM aux = tabla[i].getEnlace();
-                        
-                        while(aux!=null){
-                            dominio.insertar(dominio.longitud()+1, aux.getDominio());
-                            aux=aux.getEnlace();
+
+                        while (aux != null) {
+                            dominio.insertar(dominio.longitud() + 1, aux.getDominio());
+                            aux = aux.getEnlace();
                         }
                     }
                 }
             }
-        }        
-        
+        }
+
         return dominio;
     }
-    
-    
-    public Lista obtenerConjuntoRango(){
+
+    public Lista obtenerConjuntoRango() {
         Lista rango = new Lista();
-        
+
         for (int i = 0; i < TAM; i++) {
             NodoHashMapeoM actual = tabla[i];
-            
-            if(tabla[i]!=null){
+
+            if (tabla[i] != null) {
                 rango.pasarElementos(rango, actual.getRango());
                 NodoHashMapeoM aux = actual.getEnlace();
-                
-                while(aux!=null){
+
+                while (aux != null) {
                     rango.pasarElementos(rango, aux.getRango());
-                    aux=aux.getEnlace();
+                    aux = aux.getEnlace();
                 }
             }
         }
-        
+
         return rango;
     }
-    
-    
-    public boolean insertar(Object valorDominio){
-        boolean encontrado = false;
-        
-        int pos = hash(valorDominio);
-        
-        NodoHashMapeoM aux = tabla[pos];        
 
-        while(!encontrado && aux!=null){
-            encontrado=aux.getDominio().equals(valorDominio);
-            aux=aux.getEnlace();
+    public boolean insertar(Object valorDominio) {
+        boolean encontrado = false;
+
+        int pos = hash(valorDominio);
+
+        NodoHashMapeoM aux = tabla[pos];
+
+        while (!encontrado && aux != null) {
+            encontrado = aux.getDominio().equals(valorDominio);
+            aux = aux.getEnlace();
         }
 
-        if(!encontrado){
+        if (!encontrado) {
             tabla[pos] = new NodoHashMapeoM(valorDominio, tabla[pos]);
             cant++;
         }
-        
+
         return !encontrado;
     }
-                  
-    
-    public boolean eliminar(Object valorDominio){
+
+    public boolean eliminar(Object valorDominio) {
         boolean exito = false;
-        
+
         int pos = hash(valorDominio);
-        
-        NodoHashMapeoM aux = tabla[pos];        
-        
-        if(aux.getDominio().equals(valorDominio)){
+
+        NodoHashMapeoM aux = tabla[pos];
+
+        if (aux.getDominio().equals(valorDominio)) {
             tabla[pos] = tabla[pos].getEnlace();
             cant--;
-            exito=true;
-        }
-        else{
+            exito = true;
+        } else {
             NodoHashMapeoM anterior = aux;
-            
-            while(aux!=null && !aux.getDominio().equals(valorDominio)){
+
+            while (aux != null && !aux.getDominio().equals(valorDominio)) {
                 anterior = aux;
-                aux=aux.getEnlace();
-            }        
-            if(aux!=null){
+                aux = aux.getEnlace();
+            }
+            if (aux != null) {
                 anterior.setEnlace(aux.getEnlace());
                 cant--;
-                exito=true;
+                exito = true;
             }
-        }        
-        
+        }
+
         return exito;
     }
-    
-    
-    public boolean pertenece(Object valorDominio){
+
+    public boolean pertenece(Object valorDominio) {
         boolean exito = false;
-        
+
         int pos = hash(valorDominio);
-        
+
         NodoHashMapeoM recorre = tabla[pos];
-        
-        while(recorre!=null && !recorre.getDominio().equals(valorDominio)){
-            recorre=recorre.getEnlace();
+
+        while (recorre != null && !recorre.getDominio().equals(valorDominio)) {
+            recorre = recorre.getEnlace();
         }
-        
-        if(recorre!=null){
-            exito=true;
+
+        if (recorre != null) {
+            exito = true;
         }
-            
+
         return exito;
     }
-    
-    
-    public boolean esVacia(){
-        return cant==0;
+
+    public boolean esVacia() {
+        return cant == 0;
     }
-       
-    
-    public void vaciar(){
-        tabla=null;
-        cant=0;
+
+    public void vaciar() {
+        tabla = null;
+        cant = 0;
     }
-    
-    
+
     public MapeoAMuchos clone() {
         MapeoAMuchos clon = new MapeoAMuchos();
         clon.TAM = TAM;
@@ -224,18 +213,18 @@ public class MapeoAMuchos {
 
                 NodoHashMapeoM aux = tabla[i].getEnlace();
                 NodoHashMapeoM auxClon = clon.tabla[i];
-                
+
                 while (aux != null) {
                     NodoHashMapeoM nuevoNodo = new NodoHashMapeoM(aux.getDominio(), null);
                     rangoClon = new Lista();
                     rangoClon.pasarElementos(rangoClon, aux.getRango());
                     nuevoNodo.setRango(rangoClon);
                     auxClon.setEnlace(nuevoNodo);
-                    
+
                     auxClon = auxClon.getEnlace();
                     aux = aux.getEnlace();
                 }
-                
+
                 clon.cant++;
             }
         }
@@ -243,6 +232,22 @@ public class MapeoAMuchos {
         return clon;
     }
 
-    
-    
+    public String toString(){
+        String msg = "";
+
+        for(int i = 0; i < tabla.length; i++){
+            
+            if(tabla[i]!=null){
+                msg += tabla[i].getDominio().toString()+" --> ";
+                Lista rango = tabla[i].getRango();
+                for(int j = 0; j < rango.longitud(); j++){
+                    msg += rango.recuperar(j).toString() + "Partido "+(j+1)+" --> ";
+                }
+                msg += "\n";
+            }
+        }
+
+        return msg;
+    }
+
 }

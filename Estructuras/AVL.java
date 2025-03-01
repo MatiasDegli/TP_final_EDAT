@@ -440,6 +440,10 @@ public class AVL {
         return raiz == null;
     }
 
+    public void vaciar(){
+        raiz=null;
+    }
+
     public String toString() {
 
         String msj = toStringAux("", raiz);

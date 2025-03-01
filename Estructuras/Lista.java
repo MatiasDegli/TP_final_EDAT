@@ -1,5 +1,7 @@
 package Estructuras;
 
+import TDAs.Ciudad;
+
 public class Lista {
     
     
@@ -293,6 +295,19 @@ public class Lista {
         return mensaje;
     }
     
-    
+    // -------------------- Metodos para Ciudad -----------------------
+
+    public boolean tieneAlojamiento(){
+        boolean exito = false;
+
+        for(int i=0; i<longitud; i++){
+            Ciudad actual = (Ciudad) recuperar(i);
+            if(actual.getDisponibilidad()){
+                exito=true;
+            }
+        }
+
+        return exito;
+    }
     
 }

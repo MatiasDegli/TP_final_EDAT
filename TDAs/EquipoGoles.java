@@ -1,7 +1,7 @@
 package TDAs;
 
-public class Equipo implements Comparable{
-    
+public class EquipoGoles implements Comparable{  
+
     private String nombre;
     private String DT;
     private char grupo;
@@ -9,10 +9,12 @@ public class Equipo implements Comparable{
     private int golesAFavor = 0;
     private int golesEnContra = 0;
 
-    public Equipo(String nom, String dir, char gru){
-        nombre=nom;
-        DT=dir;
-        grupo=gru;
+    public EquipoGoles(Equipo equipo){
+        nombre=equipo.getNombre();
+        //DT=equipo.getDT();
+        //grupo=equipo.getGrupo();
+        //puntos=equipo.getPuntos();
+        golesAFavor=equipo.getGolesAFavor();
     }
 
     public String getNombre(){
@@ -69,6 +71,7 @@ public class Equipo implements Comparable{
 
     @Override
     public int compareTo(Object otro) {
-        return nombre.compareTo(((Equipo) otro).getNombre());
+        int golesOtro = ((EquipoGoles) otro).getGolesAFavor();
+        return Integer.compare(this.golesAFavor, golesOtro);
     }
 }

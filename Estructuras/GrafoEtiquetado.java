@@ -515,6 +515,21 @@ public class GrafoEtiquetado {
         return aux;
     }
 
+    public Ciudad obtenerCiudad(Ciudad ciudad){
+        NodoVert aux = inicio;
+        Ciudad ciudadEncontrada = null;
+
+        while(aux!=null && (Ciudad) aux.getElem()!=ciudad){
+            aux=aux.getSigVertice();
+        }
+
+        if(aux!=null){
+            ciudadEncontrada = (Ciudad) aux.getElem();
+        }
+
+        return ciudadEncontrada;
+    }
+
     public Lista caminoMenorTiempo(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
         Lista actual = new Lista(), rapida = new Lista();
         NodoVert origen = ubicarVertice(ciudadOrigen);
