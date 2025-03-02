@@ -69,6 +69,10 @@ public class EquipoGoles implements Comparable{
         return cadena;
     }
 
+    public String toString(){
+        return nombre;
+    }
+
     @Override
     public int compareTo(Object otro) {
         int golesOtro = ((EquipoGoles) otro).getGolesAFavor();

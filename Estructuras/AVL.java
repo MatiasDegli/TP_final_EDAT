@@ -85,12 +85,8 @@ public class AVL {
                 if (recorre.getIzquierdo() == null) {
                     recorre.setIzquierdo(new NodoAVL(elem, null, null));
                     recorre.recalcularAltura();
-                    System.out.println("recorre es: " + recorre.getElem() + " y su altura es: " + recorre.getAltura());
-                    System.out.println("su hijo izq es: " + recorre.getIzquierdo().getElem());
                     recorre = balancear(recorre);
-                    System.out.println("recorre ahora es: " + recorre.getElem());
                     recorre = balancearCompleto(recorre, raiz);
-                    System.out.println("y ahora es: " + recorre.getElem());
                 } else {
                     insertarAux(elem, recorre.getIzquierdo());
                 }
@@ -133,25 +129,19 @@ public class AVL {
                         hijo = HD;
                     }
                 } else if (HI != null && HD == null) {
-                    System.out.println("ENTRAMOS !!!");
                     balanceHijo = obtenerBalance(HI);
                     hijo = HI;
-                    System.out.println("recorre es: " + recorre.getElem() + ", hijo es: " + HI.getElem()
-                            + ", hijo de hijo es: " + HI.getIzquierdo().getElem());
                 } else if (HD != null) {
                     balanceHijo = obtenerBalance(HD);
                     hijo = HD;
                 }
 
                 if (balance == 2) {
-                    System.out.println("ENTRAMOS 2 !!! ");
                     if (balanceHijo == -1) {
                         recorre.setIzquierdo(rotacionIzquierda(hijo));
                         recorre = rotacionDerecha(recorre);
                     } else {
-
-                        System.out.println("ENTRAMOS 3 !!!");
-
+                        
                         recorre = rotacionDerecha(recorre);
                     }
                 } else if (balance == -2) {
@@ -224,9 +214,9 @@ public class AVL {
             balance = (-1 - HD.getAltura());
         }
 
-        if (Math.abs(balance) > 1) {
+        /*if (Math.abs(balance) > 1) {
             System.out.println("el nodo: " + nodo.getElem() + " esta desbalanceado");
-        }
+        }*/
 
         return balance;
     }
@@ -284,7 +274,6 @@ public class AVL {
                 recorre = balancear(raiz);
             } else if (recorre.getIzquierdo() == hijo || recorre.getDerecho() == hijo) {
                 recorre.recalcularAltura();
-                System.out.println("hijo es: " + hijo.getElem() + ", recorre es: " + recorre.getElem());
                 recorre = balancear(recorre);
                 recorre = balancearCompleto(recorre, raiz);
             } else if (recorre.getElem().compareTo(hijo.getElem()) < 0) {
@@ -457,17 +446,17 @@ public class AVL {
         if (recorre != null) {
 
             if (recorre.getIzquierdo() != null) {
-                cadena = recorre.getElem() + " es padre de "
-                        + recorre.getIzquierdo().getElem() + " (izq)";
+                cadena = recorre.getElem().toString() + " es padre de "
+                        + recorre.getIzquierdo().getElem().toString() + " (izq)";
 
                 if (recorre.getDerecho() != null) {
-                    cadena += " y de " + recorre.getDerecho().getElem() + " (der)";
+                    cadena += " y de " + recorre.getDerecho().getElem().toString() + " (der)";
                 }
             } else if (recorre.getDerecho() != null) {
-                cadena = recorre.getElem() + " es padre de "
-                        + recorre.getDerecho().getElem() + " (der)";
+                cadena = recorre.getElem().toString() + " es padre de "
+                        + recorre.getDerecho().getElem().toString() + " (der)";
             } else {
-                cadena = recorre.getElem() + " no tiene hijos";
+                cadena = recorre.getElem().toString() + " no tiene hijos";
             }
 
             cadena += "\n";

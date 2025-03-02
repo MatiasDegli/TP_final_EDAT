@@ -519,7 +519,7 @@ public class GrafoEtiquetado {
         NodoVert aux = inicio;
         Ciudad ciudadEncontrada = null;
 
-        while(aux!=null && (Ciudad) aux.getElem()!=ciudad){
+        while(aux!=null && ((Ciudad) aux.getElem()).compareTo(ciudad)!=0){
             aux=aux.getSigVertice();
         }
 

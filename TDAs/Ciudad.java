@@ -28,6 +28,10 @@ public class Ciudad implements Comparable {
         esSede = sede;
     }
 
+    public String toString(){
+        return nombre;
+    }
+
     @Override
     public int compareTo(Object otra) {
         return nombre.compareTo(((Ciudad) otra).getNombre());

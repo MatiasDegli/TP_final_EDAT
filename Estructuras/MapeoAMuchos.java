@@ -1,14 +1,12 @@
 package Estructuras;
 
-import TDAs.PartidoKey;
-
 public class MapeoAMuchos {
 
     private int TAM = 20;
     private int cant = 0;
     private NodoHashMapeoM[] tabla = new NodoHashMapeoM[TAM];
 
-    public void MapeoAMuchos() {
+    public MapeoAMuchos() {
 
     }
 
@@ -26,15 +24,13 @@ public class MapeoAMuchos {
 
         NodoHashMapeoM aux = tabla[pos];
 
+        while (aux != null && !aux.getDominio().equals(valorDominio)) {
+            aux = aux.getEnlace();
+        }
         if (aux != null) {
-            while (aux != null && !aux.getDominio().equals(valorDominio)) {
-                aux = aux.getEnlace();
-            }
-            if (aux != null) {
-                Lista listaRango = aux.getRango();
-                listaRango.insertar(listaRango.longitud() + 1, valorRango);
-                exito = true;
-            }
+            Lista listaRango = aux.getRango();
+            listaRango.insertar(listaRango.longitud() + 1, valorRango);
+            exito = true;
         }
 
         return exito;
@@ -176,7 +172,6 @@ public class MapeoAMuchos {
         boolean exito = false;
 
         int pos = hash(valorDominio);
-
         NodoHashMapeoM recorre = tabla[pos];
 
         while (recorre != null && !recorre.getDominio().equals(valorDominio)) {
@@ -232,18 +227,27 @@ public class MapeoAMuchos {
         return clon;
     }
 
-    public String toString(){
+    public String toString() {
         String msg = "";
 
-        for(int i = 0; i < tabla.length; i++){
-            
-            if(tabla[i]!=null){
-                msg += tabla[i].getDominio().toString()+" --> ";
-                Lista rango = tabla[i].getRango();
-                for(int j = 0; j < rango.longitud(); j++){
-                    msg += rango.recuperar(j).toString() + "Partido "+(j+1)+" --> ";
+        for (int i = 0; i < tabla.length; i++) {
+            NodoHashMapeoM nodo = tabla[i];
+            while (nodo != null) {
+                msg += nodo.getDominio().toString() + " --> ";
+                Lista rango = nodo.getRango();
+                for (int j = 1; j <= rango.longitud(); j++) {
+                    Object elem = rango.recuperar(j);
+                    if (elem != null) {
+                        msg += " Partido " + j + " --> " + elem.toString();
+                        if (j < rango.longitud()) {
+                            msg += " --> ";
+                        }
+                    } else {
+                        msg += "null";
+                    }
                 }
                 msg += "\n";
+                nodo=nodo.getEnlace();
             }
         }
 

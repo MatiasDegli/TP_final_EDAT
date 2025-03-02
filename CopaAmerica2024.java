@@ -28,10 +28,42 @@ public class CopaAmerica2024 {
         System.out.println("Presione cualquier caracter para iniciar la carga o 1 si quiere finalizar el programa");
         String inicio = scanner.nextLine();
 
-        if (inicio != "1") {
+        if (!inicio.equals("1")) {
             cargarDatos(texto, equipos, partidos, ciudades);
             mostrarSistema(ciudades, equipos, partidos);
         }
+
+        int opcion = 0;
+
+        while (opcion != 4) {
+            System.out.println("MENU PRINCIPAL");
+            System.out.println("1. Operaciones de Ciudades");
+            System.out.println("2. Operaciones de Equipos");
+            System.out.println("3. Operaciones de Partidos");
+            System.out.println("4. Finalizar programa");
+            System.out.print("Ingrese su opción: ");
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcion) {
+                case 1:
+                    menuCiudades(ciudades);
+                    break;
+                case 2:
+                    menuEquipos(equipos, partidos);
+                    break;
+                case 3:
+                    menuPartidos(partidos, equipos);
+                    break;
+                case 4:
+                    System.out.println("Saliendo del sistema...");
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        }
+
+        scanner.close();
     }
 
     public static void cargarDatos(String texto, AVL equipos, MapeoAMuchos partidos, GrafoEtiquetado ciudades)
@@ -113,8 +145,11 @@ public class CopaAmerica2024 {
         }
 
         Partido partido = new Partido(ins, ciudad, estadio, gol1, gol2);
+        
 
-        partidos.insertar(key);
+        if(!partidos.pertenece(key)){
+            partidos.insertar(key);
+        }
         partidos.asociar(key, partido);
     }
 
@@ -133,7 +168,7 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
         String opcion = "";
 
-        while (opcion != "8") {
+        while (!opcion.equals("8")) {
             System.out.println(menuCiudadAux());
 
             opcion = scanner.nextLine();
@@ -278,7 +313,7 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
         String opcion = "";
 
-        while (opcion != "4") {
+        while (!opcion.equals("7")) {
             System.out.println(menuEquipoAux());
 
             opcion = scanner.nextLine();
@@ -287,30 +322,23 @@ public class CopaAmerica2024 {
                 case "1":
                     agregarEquipo(equipos);
                     break;
-
                 case "2":
                     eliminarEquipo(equipos);
                     break;
-
                 case "3":
                     modificarEquipo(equipos);
                     break;
-
                 case "4":
                     datosPais(equipos, partidos);
                     break;
-
                 case "5":
                     rangoAlfabetico(equipos);
                     break;
-
                 case "6":
                     listaGoles(equipos);
                     break;
-
                 case "7":
                     break;
-
                 default:
                     System.out.println("Opción invalida");
                     break;
@@ -323,7 +351,7 @@ public class CopaAmerica2024 {
                 "Ingrese 2 para eliminar un equipo.\n" +
                 "Ingrese 3 para modificar un equipo\n" +
                 "Ingrese 4 si quiere ver los datos de una selección\n" +
-                "Ingrese 5 si quiere ver los equipos por orden alfabético\n" +
+                "Ingrese 5 si quiere ver los equipos por orden alfabético entre dos cadenas dadas\n" +
                 "Ingrese 6 si quiere ver los equipos por orden de goles a favor\n" +
                 "Ingrese 7 si quiere salir del menu";
 
@@ -376,7 +404,7 @@ public class CopaAmerica2024 {
         if (equipo != null) {
             String opcion = "";
 
-            while (opcion != "3") {
+            while (!opcion.equals("3")) {
 
                 System.out.println("Ingrese 1 si desea modificar el DT, 2 si desea modificar el grupo, "
                         + "3 si quiere salir del menu");
@@ -388,11 +416,11 @@ public class CopaAmerica2024 {
                         String dir = scanner.nextLine();
                         equipo.setDT(dir);
                         break;
-
                     case "2":
                         System.out.println("Ingrese el nuevo grupo");
                         break;
-
+                    case "3":
+                        break;
                     default:
                         System.out.println("Cadena inválida");
                         break;
@@ -418,15 +446,11 @@ public class CopaAmerica2024 {
                 case "1":
                     agregarPartido(partidos, equipos);
                     break;
-
                 case "2":
                     resultados(partidos);
                     break;
-
                 case "3":
-
                     break;
-
                 default:
                     System.out.println("Opción invalida");
                     break;

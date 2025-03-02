@@ -67,6 +67,10 @@ public class Equipo implements Comparable{
         return cadena;
     }
 
+    public String toString(){
+        return nombre;
+    }
+
     @Override
     public int compareTo(Object otro) {
         return nombre.compareTo(((Equipo) otro).getNombre());
