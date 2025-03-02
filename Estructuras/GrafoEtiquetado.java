@@ -507,11 +507,11 @@ public class GrafoEtiquetado {
             Ciudad ciudadActual = (Ciudad) aux.getElem();
 
             while (aux != null && ciudadActual.compareTo(ciudad) != 0) {
-                aux = aux.getSigVertice();
                 ciudadActual = (Ciudad) aux.getElem();
+                aux = aux.getSigVertice();
             }
         }
-
+        
         return aux;
     }
 

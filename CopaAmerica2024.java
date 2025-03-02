@@ -15,39 +15,33 @@ import TDAs.PartidoKey;
 
 public class CopaAmerica2024 {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException {
 
         Scanner scanner = new Scanner(System.in);
 
         GrafoEtiquetado ciudades = new GrafoEtiquetado();
         AVL equipos = new AVL();
         MapeoAMuchos partidos = new MapeoAMuchos();
-        Lista colCiudades = new Lista();
-        Lista colEquipos = new Lista();
 
         String texto = "CopaAmerica2024.txt";
+
+        System.out.println("Presione cualquier caracter para iniciar la carga o 1 si quiere finalizar el programa");
+        String inicio = scanner.nextLine();
+
+        if (inicio != "1") {
+            cargarDatos(texto, equipos, partidos, ciudades);
+            mostrarSistema(ciudades, equipos, partidos);
+        }
+    }
+
+    public static void cargarDatos(String texto, AVL equipos, MapeoAMuchos partidos, GrafoEtiquetado ciudades)
+            throws FileNotFoundException, IOException {
 
         try (BufferedReader br = new BufferedReader(new FileReader(texto))) {
 
             String linea;
 
             while ((linea = br.readLine()) != null) {
-
-            }
-
-        } catch (IOException ex) {
-            System.out.println("Error al leer el archivo");
-        }
-    }
-
-    public static void cargarDatos(String datos, AVL equipos, MapeoAMuchos partidos, GrafoEtiquetado ciudades,
-            Lista colCiudades) throws FileNotFoundException, IOException {
-
-        try (BufferedReader bufferLectura = new BufferedReader(new FileReader(datos))) {
-
-            String linea;
-
-            while ((linea = bufferLectura.readLine()) != null) {
 
                 String[] datosLinea = linea.split(";");
 
@@ -56,7 +50,7 @@ public class CopaAmerica2024 {
                 } else if (datosLinea[0].equals("P")) {
                     cargarPartido(datosLinea, partidos, equipos);
                 } else if (datosLinea[0].equals("C")) {
-                    cargarCiudad(datosLinea, ciudades, colCiudades);
+                    cargarCiudad(datosLinea, ciudades);
                 } else if (datosLinea[0].equals("R")) {
                     cargarRuta(datosLinea, ciudades);
                 }
@@ -64,14 +58,12 @@ public class CopaAmerica2024 {
         }
     }
 
-    public static void cargarCiudad(String[] datos, GrafoEtiquetado ciudades, Lista colCiudades) {
+    public static void cargarCiudad(String[] datos, GrafoEtiquetado ciudades) {
         String nombre = datos[1];
         boolean disponibilidad = datos[2].equals("TRUE");
         boolean sede = datos[3].equals("TRUE");
 
         Ciudad ciudad = new Ciudad(nombre, disponibilidad, sede);
-
-        colCiudades.insertar(colCiudades.longitud() - 1, ciudad);
 
         ciudades.insertarVertice(ciudad);
     }
@@ -138,27 +130,71 @@ public class CopaAmerica2024 {
     }
 
     public static void menuCiudades(GrafoEtiquetado ciudades) {
+        Scanner scanner = new Scanner(System.in);
+        String opcion = "";
 
-        switch ("Elija una opcion para las ciudades") {
-            case "1":
+        while (opcion != "8") {
+            System.out.println(menuCiudadAux());
 
-                break;
+            opcion = scanner.nextLine();
 
-            case "2":
+            switch (opcion) {
+                case "1":
+                    agregarCiudad(ciudades);
+                    break;
 
-                break;
+                case "2":
+                    eliminarCiudad(ciudades);
+                    break;
 
-            case "3":
+                case "3":
+                    modificarCiudad(ciudades);
+                    break;
 
-                break;
+                case "4":
+                    menorEscala(ciudades);
+                    break;
 
-            default:
-                break;
+                case "5":
+                    menorTiempo(ciudades);
+                    break;
+
+                case "6":
+                    menorTiempoAlt(ciudades);
+                    break;
+
+                case "7":
+                    caminosCompleto(ciudades);
+                    break;
+
+                case "8":
+
+                    break;
+
+                default:
+                    System.out.println("Opción invalida");
+                    break;
+            }
         }
-
     }
 
-    public static void agregarCiudad(GrafoEtiquetado ciudades, Lista colCiudades) {
+    private static String menuCiudadAux() {
+        String mensaje = "Ingrese 1 para agregar una ciudad.\n" +
+                "Ingrese 2 para eliminar una ciudad.\n" +
+                "Ingrese 3 para modificar una ciudad\n" +
+                "Ingrese 4 si quiere conocer el camino de una ciudad a otra con la menor cantidad de escalas posibles\n"
+                +
+                "Ingrese 5 si quiere conocer el camino de una ciudad a otra con el menor tiempo de vuelo posible\n" +
+                "Ingrese 6 si quiere conocer el camino de una ciudad a otra con el menor tiempo de vuelo posible sin pasar por"
+                +
+                "una ciudad dada\n" +
+                "Ingrese 7 si quiere ver todos los caminos posibles entre dos ciudades dadas\n" +
+                "Ingrese 8 si quiere salir del menu";
+
+        return mensaje;
+    }
+
+    public static void agregarCiudad(GrafoEtiquetado ciudades) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad");
@@ -172,66 +208,126 @@ public class CopaAmerica2024 {
 
         if (!ciudades.existeVertice(ciudad)) {
             ciudades.insertarVertice(ciudad);
-            colCiudades.insertar(colCiudades.longitud() - 1, ciudad);
         }
     }
 
-    public static void eliminarCiudad(GrafoEtiquetado ciudades, Lista colCiudades) {
+    public static void eliminarCiudad(GrafoEtiquetado ciudades) {
         Scanner scanner = new Scanner(System.in);
-        int i = 0;
 
         System.out.println("Ingrese el nombre de la ciudad");
         String nombre = scanner.nextLine();
-        boolean encontrada = false;
 
-        while (!encontrada && i < colCiudades.longitud()) {
-            Ciudad ciudad = (Ciudad) colCiudades.recuperar(i);
+        Ciudad ciudad = new Ciudad(nombre, false, false);
+        ciudad = ciudades.obtenerCiudad(ciudad);
 
-            if (ciudad.getNombre().equals(nombre)) {
-                encontrada = true;
-                colCiudades.eliminar(i);
-                ciudades.eliminarVertice(ciudad);
-                System.out.println("La ciudad fue eliminada con exito");
-            } else {
-                i++;
-            }
-        }
-
-        if (!encontrada) {
-            System.out.println("La ciudad no es parte del mapa");
-        }
-    }
-
-    public static void modificarCiudad(GrafoEtiquetado ciudades, Lista colCiudades) {
-        Scanner scanner = new Scanner(System.in);
-        int i = 0;
-
-        System.out.println("Ingrese el nombre de la ciudad");
-        String nombre = scanner.nextLine();
-        Ciudad ciudad = (Ciudad) colCiudades.recuperar(i);
-
-        while (!ciudad.getNombre().equals(nombre) && i < colCiudades.longitud()) {
-            i++;
-            ciudad = (Ciudad) colCiudades.recuperar(i);
-        }
-
-        if (!(i < colCiudades.longitud())) {
-            System.out.println("Ingrese la disponibilidad");
-            boolean disponibilidad = ("TRUE".equals(scanner.nextLine().toUpperCase()));
-            ciudad.setDisponibilidad(disponibilidad);
-
-            System.out.println("Ingrese si es sede o no lo es");
-            boolean sede = ("TRUE".equals(scanner.nextLine().toUpperCase()));
-            ciudad.setSede(sede);
-
-            //////////////////////////////////////////////////////////////////////////// MODIFICAR,
-            //////////////////////////////////////////////////////////////////////////// IMPLEMENTAR
-            //////////////////////////////////////////////////////////////////////////// SWITCH
-
-            System.out.println("La ciudad fue modificada con exito");
+        if (ciudad != null) {
+            ciudades.eliminarVertice(ciudad);
+            System.out.println("La ciudad fue eliminada con exito");
         } else {
             System.out.println("La ciudad no es parte del mapa");
         }
+    }
+
+    public static void modificarCiudad(GrafoEtiquetado ciudades) {
+        Scanner scanner = new Scanner(System.in);
+        int i = 0;
+
+        System.out.println("Ingrese el nombre de la ciudad");
+        String nombre = scanner.nextLine();
+        Ciudad ciudad = new Ciudad(nombre, false, false);
+        ciudad = ciudades.obtenerCiudad(ciudad);
+
+        if (ciudad != null) {
+            String opcion = "";
+
+            while (opcion != "3") {
+
+                System.out.println(
+                        "Ingrese 1 si desea modificar la disponibilidad, 2 si desea modificar si la ciudad es o no es sede, "
+                                + "3 si quiere salir del menu");
+                opcion = scanner.nextLine();
+
+                switch (opcion) {
+                    case "1":
+                        System.out.println("Ingrese true si hay disponibilidad, de lo contrario ingrese false");
+                        String disp = scanner.nextLine().toUpperCase();
+                        ciudad.setDisponibilidad(disp.equals("TRUE"));
+                        break;
+
+                    case "2":
+                        System.out.println("Ingrese true si es sede, de lo contrario ingrese false");
+                        String sede = scanner.nextLine().toUpperCase();
+                        ciudad.setSede(sede.equals("TRUE"));
+                        break;
+
+                    case "3":
+                        break;
+
+                    default:
+                        System.out.println("Cadena inválida");
+                        break;
+                }
+            }
+            System.out.println("La ciudad se modifico con exito");
+        } else {
+            System.out.println("La ciudad no es parte del mapa");
+        }
+    }
+
+    public static void menuEquipos(AVL equipos, MapeoAMuchos partidos) {
+        Scanner scanner = new Scanner(System.in);
+        String opcion = "";
+
+        while (opcion != "4") {
+            System.out.println(menuEquipoAux());
+
+            opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    agregarEquipo(equipos);
+                    break;
+
+                case "2":
+                    eliminarEquipo(equipos);
+                    break;
+
+                case "3":
+                    modificarEquipo(equipos);
+                    break;
+
+                case "4":
+                    datosPais(equipos, partidos);
+                    break;
+
+                case "5":
+                    rangoAlfabetico(equipos);
+                    break;
+
+                case "6":
+                    listaGoles(equipos);
+                    break;
+
+                case "7":
+                    break;
+
+                default:
+                    System.out.println("Opción invalida");
+                    break;
+            }
+        }
+    }
+
+    private static String menuEquipoAux() {
+        String mensaje = "Ingrese 1 para agregar un equipo.\n" +
+                "Ingrese 2 para eliminar un equipo.\n" +
+                "Ingrese 3 para modificar un equipo\n" +
+                "Ingrese 4 si quiere ver los datos de una selección\n" +
+                "Ingrese 5 si quiere ver los equipos por orden alfabético\n" +
+                "Ingrese 6 si quiere ver los equipos por orden de goles a favor\n" +
+                "Ingrese 7 si quiere salir del menu";
+
+        return mensaje;
     }
 
     public static void agregarEquipo(AVL equipos) {
@@ -252,86 +348,105 @@ public class CopaAmerica2024 {
 
     }
 
-    public static void eliminarEquipo(AVL equipos, Lista colEquipos) {
+    public static void eliminarEquipo(AVL equipos) {
         Scanner scanner = new Scanner(System.in);
-        int i = 0;
 
         System.out.println("Ingrese el nombre del equipo");
         String nombre = scanner.nextLine();
-        boolean encontrado = false;
+        Equipo equipo = new Equipo(nombre, "xx", 'X');
+        equipo = (Equipo) equipos.obtenerIgual(equipo);
 
-        while (!encontrado && i < colEquipos.longitud()) {
-            Equipo equipo = (Equipo) colEquipos.recuperar(i);
-
-            if (equipo.getNombre().equals(nombre)) {
-                encontrado = true;
-                colEquipos.eliminar(i);
-                equipos.eliminar(equipo);
-                System.out.println("El equipo fue eliminado con exito");
-            } else {
-                i++;
-            }
-        }
-
-        if (!encontrado) {
+        if (equipo != null) {
+            equipos.eliminar(equipo);
+            System.out.println("El equipo fue eliminado con exito");
+        } else {
             System.out.println("El equipo no es parte del fixture");
         }
     }
 
-    public static void modificarEquipo(AVL equipos, Lista colEquipos) {
+    public static void modificarEquipo(AVL equipos) {
         Scanner scanner = new Scanner(System.in);
 
-        int i = 0;
-        boolean encontrado = false;
         System.out.println("Ingrese el nombre del equipo que desea modificar");
         String nombre = scanner.nextLine().toUpperCase();
 
-        while (encontrado = false && i < colEquipos.longitud()) {
-            Equipo equipo = (Equipo) colEquipos.recuperar(i);
+        Equipo equipo = new Equipo(nombre, "xx", 'X');
+        equipo = (Equipo) equipos.obtenerIgual(equipo);
 
-            if (equipo.getNombre().equals(nombre)) {
-                encontrado = true;
-            } else {
-                i++;
-            }
+        if (equipo != null) {
+            String opcion = "";
 
-            if (encontrado) {
-                String opcion = "";
+            while (opcion != "3") {
 
-                while (opcion != "3") {
+                System.out.println("Ingrese 1 si desea modificar el DT, 2 si desea modificar el grupo, "
+                        + "3 si quiere salir del menu");
+                opcion = scanner.nextLine();
 
-                    System.out.println("Ingrese 1 si desea modificar el DT, 2 si desea modificar el grupo, "
-                            + "3 si quiere finalizar");
-                    opcion = scanner.nextLine();
+                switch (opcion) {
+                    case "1":
+                        System.out.println("Ingrese el nombre del DT");
+                        String dir = scanner.nextLine();
+                        equipo.setDT(dir);
+                        break;
 
-                    switch (opcion) {
-                        case "1":
-                            System.out.println("Ingrese el nombre del DT");
-                            String dir = scanner.nextLine();
-                            equipo.setDT(dir);
-                            break;
+                    case "2":
+                        System.out.println("Ingrese el nuevo grupo");
+                        break;
 
-                        case "2":
-                            System.out.println("Ingrese el nuevo grupo");
-                            break;
-
-                        default:
-                            System.out.println("Cadena inválida");
-                            break;
-                    }
+                    default:
+                        System.out.println("Cadena inválida");
+                        break;
                 }
+            }
+            System.out.println("El equipo se modifico con exito");
+        } else {
+            System.out.println("El equipo no es parte del fixture");
+        }
 
-                System.out.println("La ciudad se modifico con exito");
-            } else {
-                System.out.println("El equipo no es parte del fixture");
+    }
+
+    public static void menuPartidos(MapeoAMuchos partidos, AVL equipos) {
+        Scanner scanner = new Scanner(System.in);
+        String opcion = "";
+
+        while (opcion != "4") {
+            System.out.println(menuPartidoAux());
+
+            opcion = scanner.nextLine();
+
+            switch (opcion) {
+                case "1":
+                    agregarPartido(partidos, equipos);
+                    break;
+
+                case "2":
+                    resultados(partidos);
+                    break;
+
+                case "3":
+
+                    break;
+
+                default:
+                    System.out.println("Opción invalida");
+                    break;
             }
         }
     }
 
-    public static void agregarPartido(MapeoAMuchos partidos, Lista colEquipos) {
+    private static String menuPartidoAux() {
+        String mensaje = "Ingrese 1 para agregar un partido.\n" +
+                "Ingrese 2 para ver los resultados entre dos equipos dados.\n" +
+                "Ingrese 3 si quiere salir del menu";
+
+        return mensaje;
+    }
+
+    public static void agregarPartido(MapeoAMuchos partidos, AVL equipos) {
         Scanner scanner = new Scanner(System.in);
 
         String muestraEquipos = "";
+        Lista colEquipos = equipos.listar();
 
         for (int i = 0; i < colEquipos.longitud(); i++) {
             muestraEquipos += colEquipos.recuperar(i) + ": " + (i + 1) + "; ";
@@ -564,7 +679,7 @@ public class CopaAmerica2024 {
         listaEquipos.vaciar();
     }
 
-    public static void mostrarSistema(GrafoEtiquetado ciudades, AVL equipos, MapeoAMuchos partidos) {
+    private static void mostrarSistema(GrafoEtiquetado ciudades, AVL equipos, MapeoAMuchos partidos) {
         /*
          * Mostrar sistema: es una operación de debugging que permite ver todas las
          * estructuras utilizadas con su contenido
@@ -575,7 +690,6 @@ public class CopaAmerica2024 {
         System.out.println("Grafo de ciudades: " + ciudades.toString());
         System.out.println("AVL de equipos: " + equipos.toString());
         System.out.println("Mapeo de partidos: " + partidos.toString());
-        
     }
 
 }
