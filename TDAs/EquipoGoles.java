@@ -78,4 +78,16 @@ public class EquipoGoles implements Comparable{
         int golesOtro = ((EquipoGoles) otro).getGolesAFavor();
         return Integer.compare(this.golesAFavor, golesOtro);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean iguales = false;
+        EquipoGoles otro = (EquipoGoles) obj;
+        if(obj!=null){
+            if(golesAFavor == otro.golesAFavor){
+                iguales=true;
+            }
+        }
+        return iguales;
+    }
 }

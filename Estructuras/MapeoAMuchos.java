@@ -17,19 +17,51 @@ public class MapeoAMuchos {
         return Math.abs(valorDominio.toString().hashCode()) % TAM;
     }
 
+    public boolean insertar(Object valorDominio, Object valorRango) {
+        boolean encontrado = false;
+
+        int pos = hash(valorDominio);
+
+        NodoHashMapeoM aux = tabla[pos];
+
+        while (!encontrado && aux != null) {
+            encontrado = aux.getDominio().equals(valorDominio);
+            aux = aux.getEnlace();
+        }
+
+        if (!encontrado) {
+            
+        }
+
+        return !encontrado;
+    }
+
     public boolean asociar(Object valorDominio, Object valorRango) {
         boolean exito = false;
 
         int pos = hash(valorDominio);
 
         NodoHashMapeoM aux = tabla[pos];
+        boolean encontrado = false;
 
-        while (aux != null && !aux.getDominio().equals(valorDominio)) {
-            aux = aux.getEnlace();
+        while (aux != null && !encontrado) {
+            encontrado = aux.getDominio().equals(valorDominio);
+            
+            if(!encontrado){
+                aux = aux.getEnlace();
+            }
         }
-        if (aux != null) {
+
+        if (encontrado) {
             Lista listaRango = aux.getRango();
             listaRango.insertar(listaRango.longitud() + 1, valorRango);
+            exito = true;
+        }
+        else{
+            tabla[pos] = new NodoHashMapeoM(valorDominio, tabla[pos]);
+            Lista rango = tabla[pos].getRango();
+            rango.insertar(rango.longitud() + 1, valorRango);
+            cant++;
             exito = true;
         }
 
@@ -42,10 +74,12 @@ public class MapeoAMuchos {
         int pos = hash(valorDominio);
 
         NodoHashMapeoM aux = tabla[pos];
+        NodoHashMapeoM anterior = null;
 
         if (aux != null) {
             // La tabla tiene uno o más elementos en la posicion pos
             while (aux.getEnlace() != null && aux.getDominio().equals(valorDominio)) {
+                anterior = aux;
                 aux = aux.getEnlace();
             }
             if (aux != null) {
@@ -53,6 +87,15 @@ public class MapeoAMuchos {
                 Lista rango = aux.getRango();
                 exito = rango.eliminarAparicion(valorRango);
                 // Elimina el valor en la lista si lo encuentra
+                if(rango.esVacia()){
+                    if (anterior == null) {
+                        tabla[pos] = tabla[pos].getEnlace();
+                    } else {
+                        anterior.setEnlace(aux.getEnlace());
+                    }
+                    cant--;
+                    exito = true;
+                }
             }
         }
 
@@ -120,54 +163,6 @@ public class MapeoAMuchos {
         return rango;
     }
 
-    public boolean insertar(Object valorDominio) {
-        boolean encontrado = false;
-
-        int pos = hash(valorDominio);
-
-        NodoHashMapeoM aux = tabla[pos];
-
-        while (!encontrado && aux != null) {
-            encontrado = aux.getDominio().equals(valorDominio);
-            aux = aux.getEnlace();
-        }
-
-        if (!encontrado) {
-            tabla[pos] = new NodoHashMapeoM(valorDominio, tabla[pos]);
-            cant++;
-        }
-
-        return !encontrado;
-    }
-
-    public boolean eliminar(Object valorDominio) {
-        boolean exito = false;
-
-        int pos = hash(valorDominio);
-
-        NodoHashMapeoM aux = tabla[pos];
-
-        if (aux.getDominio().equals(valorDominio)) {
-            tabla[pos] = tabla[pos].getEnlace();
-            cant--;
-            exito = true;
-        } else {
-            NodoHashMapeoM anterior = aux;
-
-            while (aux != null && !aux.getDominio().equals(valorDominio)) {
-                anterior = aux;
-                aux = aux.getEnlace();
-            }
-            if (aux != null) {
-                anterior.setEnlace(aux.getEnlace());
-                cant--;
-                exito = true;
-            }
-        }
-
-        return exito;
-    }
-
     public boolean pertenece(Object valorDominio) {
         boolean exito = false;
 
@@ -229,8 +224,9 @@ public class MapeoAMuchos {
 
     public String toString() {
         String msg = "";
+        int longitudTanbla = tabla.length;
 
-        for (int i = 0; i < tabla.length; i++) {
+        for (int i = 0; i < longitudTanbla; i++) {
             NodoHashMapeoM nodo = tabla[i];
             while (nodo != null) {
                 msg += nodo.getDominio().toString() + " --> ";
@@ -247,7 +243,7 @@ public class MapeoAMuchos {
                     }
                 }
                 msg += "\n";
-                nodo=nodo.getEnlace();
+                nodo = nodo.getEnlace();
             }
         }
 

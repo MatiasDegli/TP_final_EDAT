@@ -13,15 +13,17 @@ import TDAs.EquipoGoles;
 import TDAs.Partido;
 import TDAs.PartidoKey;
 
+
 public class CopaAmerica2024 {
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-
+        
         Scanner scanner = new Scanner(System.in);
 
         GrafoEtiquetado ciudades = new GrafoEtiquetado();
         AVL equipos = new AVL();
         MapeoAMuchos partidos = new MapeoAMuchos();
+        Escritura logger = new Escritura("LOG.txt", ciudades, equipos, partidos);
 
         String texto = "CopaAmerica2024.txt";
 
@@ -30,40 +32,81 @@ public class CopaAmerica2024 {
 
         if (!inicio.equals("1")) {
             cargarDatos(texto, equipos, partidos, ciudades);
+            logger.escribir("Estado inicial del sistema:");
+            logger.escribirEstructuras();
             mostrarSistema(ciudades, equipos, partidos);
+
+            int opcion = 0;
+
+            while (opcion != 5) {
+                System.out.println("MENU PRINCIPAL");
+                System.out.println("1. Operaciones de Ciudades");
+                System.out.println("2. Operaciones de Equipos");
+                System.out.println("3. Operaciones de Partidos");
+                System.out.println("4. Visualizar estructuras");
+                System.out.println("5. Finalizar programa");
+                System.out.print("Ingrese su opción: ");
+                opcion = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (opcion) {
+                    case 1:
+                        menuCiudades(ciudades, logger);
+                        break;
+                    case 2:
+                        menuEquipos(equipos, partidos, logger);
+                        break;
+                    case 3:
+                        menuPartidos(partidos, equipos, logger);
+                        break;
+                    case 4:
+                        mostrarSistema(ciudades, equipos, partidos);
+                        break;
+                    case 5:
+                        System.out.println("Saliendo del sistema...");
+                        break;
+                    default:
+                        System.out.println("Opción inválida.");
+                }
+            }
         }
+
+        scanner.close();
+        logger.escribir("Las estructuras quedaron de la siguiente manera: ");
+        logger.escribirEstructuras();
+        logger.cerrar();
+    }
+
+    private static void mostrarSistema(GrafoEtiquetado ciudades, AVL equipos, MapeoAMuchos partidos) {
+        Scanner scanner = new Scanner(System.in);
 
         int opcion = 0;
 
         while (opcion != 4) {
-            System.out.println("MENU PRINCIPAL");
-            System.out.println("1. Operaciones de Ciudades");
-            System.out.println("2. Operaciones de Equipos");
-            System.out.println("3. Operaciones de Partidos");
-            System.out.println("4. Finalizar programa");
-            System.out.print("Ingrese su opción: ");
+            System.out.println("1. Visualizar ciudades");
+            System.out.println("2. Visualizar equipos");
+            System.out.println("3. Visualizar partidos");
+            System.out.println("4. Volver al menu principal");
+
             opcion = scanner.nextInt();
             scanner.nextLine();
 
             switch (opcion) {
                 case 1:
-                    menuCiudades(ciudades);
+                    System.out.println(ciudades.toString());
                     break;
                 case 2:
-                    menuEquipos(equipos, partidos);
+                    System.out.println(equipos.toString());
                     break;
                 case 3:
-                    menuPartidos(partidos, equipos);
+                    System.out.println(partidos.toString());
                     break;
                 case 4:
-                    System.out.println("Saliendo del sistema...");
                     break;
                 default:
                     System.out.println("Opción inválida.");
             }
         }
-
-        scanner.close();
     }
 
     public static void cargarDatos(String texto, AVL equipos, MapeoAMuchos partidos, GrafoEtiquetado ciudades)
@@ -145,11 +188,7 @@ public class CopaAmerica2024 {
         }
 
         Partido partido = new Partido(ins, ciudad, estadio, gol1, gol2);
-        
 
-        if(!partidos.pertenece(key)){
-            partidos.insertar(key);
-        }
         partidos.asociar(key, partido);
     }
 
@@ -164,7 +203,7 @@ public class CopaAmerica2024 {
         ciudades.insertarArco(origen, destino, mins);
     }
 
-    public static void menuCiudades(GrafoEtiquetado ciudades) {
+    public static void menuCiudades(GrafoEtiquetado ciudades, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
         String opcion = "";
 
@@ -175,11 +214,11 @@ public class CopaAmerica2024 {
 
             switch (opcion) {
                 case "1":
-                    agregarCiudad(ciudades);
+                    agregarCiudad(ciudades, logger);
                     break;
 
                 case "2":
-                    eliminarCiudad(ciudades);
+                    eliminarCiudad(ciudades, logger);
                     break;
 
                 case "3":
@@ -224,29 +263,36 @@ public class CopaAmerica2024 {
                 +
                 "una ciudad dada\n" +
                 "Ingrese 7 si quiere ver todos los caminos posibles entre dos ciudades dadas\n" +
-                "Ingrese 8 si quiere salir del menu";
+                "Ingrese 8 si quiere volver al menu principal";
 
         return mensaje;
     }
 
-    public static void agregarCiudad(GrafoEtiquetado ciudades) {
+    public static void agregarCiudad(GrafoEtiquetado ciudades, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad");
-        String nombre = scanner.nextLine();
-        System.out.println("Indique la disponibilidad");
-        boolean disponibilidad = ("TRUE".equals(scanner.nextLine().toUpperCase()));
-        System.out.println("Indique si es sede");
-        boolean sede = ("TRUE".equals(scanner.nextLine().toUpperCase()));
+        String nombre = scanner.nextLine().toUpperCase();
 
-        Ciudad ciudad = new Ciudad(nombre, disponibilidad, sede);
+        if (ciudades.existeCiudad(new Ciudad(nombre, false, false))) {
+            System.out.println("La ciudad ya es parte del mapa\n");
+        } else {
+            System.out.println("Indique la disponibilidad");
+            boolean disponibilidad = ("TRUE".equals(scanner.nextLine().toUpperCase()));
+            System.out.println("Indique si es sede");
+            boolean sede = ("TRUE".equals(scanner.nextLine().toUpperCase()));
 
-        if (!ciudades.existeVertice(ciudad)) {
+            Ciudad ciudad = new Ciudad(nombre, disponibilidad, sede);
+
             ciudades.insertarVertice(ciudad);
+            System.out.println("La ciudad fue agregada con exito\n");
+
+            logger.escribir("Se agregó la ciudad "+nombre);
         }
+
     }
 
-    public static void eliminarCiudad(GrafoEtiquetado ciudades) {
+    public static void eliminarCiudad(GrafoEtiquetado ciudades, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad");
@@ -258,6 +304,8 @@ public class CopaAmerica2024 {
         if (ciudad != null) {
             ciudades.eliminarVertice(ciudad);
             System.out.println("La ciudad fue eliminada con exito");
+
+            logger.escribir("Se eliminó la ciudad "+nombre);
         } else {
             System.out.println("La ciudad no es parte del mapa");
         }
@@ -265,21 +313,20 @@ public class CopaAmerica2024 {
 
     public static void modificarCiudad(GrafoEtiquetado ciudades) {
         Scanner scanner = new Scanner(System.in);
-        int i = 0;
 
         System.out.println("Ingrese el nombre de la ciudad");
-        String nombre = scanner.nextLine();
+        String nombre = scanner.nextLine().toUpperCase();
         Ciudad ciudad = new Ciudad(nombre, false, false);
         ciudad = ciudades.obtenerCiudad(ciudad);
 
         if (ciudad != null) {
             String opcion = "";
 
-            while (opcion != "3") {
+            while (!opcion.equals("3")) {
 
                 System.out.println(
                         "Ingrese 1 si desea modificar la disponibilidad, 2 si desea modificar si la ciudad es o no es sede, "
-                                + "3 si quiere salir del menu");
+                                + "3 si quiere volver al menu principal");
                 opcion = scanner.nextLine();
 
                 switch (opcion) {
@@ -309,7 +356,7 @@ public class CopaAmerica2024 {
         }
     }
 
-    public static void menuEquipos(AVL equipos, MapeoAMuchos partidos) {
+    public static void menuEquipos(AVL equipos, MapeoAMuchos partidos, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
         String opcion = "";
 
@@ -320,10 +367,10 @@ public class CopaAmerica2024 {
 
             switch (opcion) {
                 case "1":
-                    agregarEquipo(equipos);
+                    agregarEquipo(equipos, logger);
                     break;
                 case "2":
-                    eliminarEquipo(equipos);
+                    eliminarEquipo(equipos, logger);
                     break;
                 case "3":
                     modificarEquipo(equipos);
@@ -353,12 +400,12 @@ public class CopaAmerica2024 {
                 "Ingrese 4 si quiere ver los datos de una selección\n" +
                 "Ingrese 5 si quiere ver los equipos por orden alfabético entre dos cadenas dadas\n" +
                 "Ingrese 6 si quiere ver los equipos por orden de goles a favor\n" +
-                "Ingrese 7 si quiere salir del menu";
+                "Ingrese 7 si quiere volver al menu principal";
 
         return mensaje;
     }
 
-    public static void agregarEquipo(AVL equipos) {
+    public static void agregarEquipo(AVL equipos, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre del pais");
@@ -373,20 +420,21 @@ public class CopaAmerica2024 {
         Equipo equipo = new Equipo(pais, dt, grupo);
 
         equipos.insertar(equipo);
-
+        logger.escribir("Se agrego al equipo "+pais);
     }
 
-    public static void eliminarEquipo(AVL equipos) {
+    public static void eliminarEquipo(AVL equipos, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre del equipo");
-        String nombre = scanner.nextLine();
-        Equipo equipo = new Equipo(nombre, "xx", 'X');
+        String pais = scanner.nextLine();
+        Equipo equipo = new Equipo(pais, "xx", 'X');
         equipo = (Equipo) equipos.obtenerIgual(equipo);
 
         if (equipo != null) {
             equipos.eliminar(equipo);
             System.out.println("El equipo fue eliminado con exito");
+            System.out.println("Se elimino al equipo "+pais);
         } else {
             System.out.println("El equipo no es parte del fixture");
         }
@@ -433,18 +481,18 @@ public class CopaAmerica2024 {
 
     }
 
-    public static void menuPartidos(MapeoAMuchos partidos, AVL equipos) {
+    public static void menuPartidos(MapeoAMuchos partidos, AVL equipos, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
         String opcion = "";
 
-        while (opcion != "4") {
+        while (!opcion.equals("3")) {
             System.out.println(menuPartidoAux());
 
             opcion = scanner.nextLine();
 
             switch (opcion) {
                 case "1":
-                    agregarPartido(partidos, equipos);
+                    agregarPartido(partidos, equipos, logger);
                     break;
                 case "2":
                     resultados(partidos);
@@ -461,30 +509,33 @@ public class CopaAmerica2024 {
     private static String menuPartidoAux() {
         String mensaje = "Ingrese 1 para agregar un partido.\n" +
                 "Ingrese 2 para ver los resultados entre dos equipos dados.\n" +
-                "Ingrese 3 si quiere salir del menu";
+                "Ingrese 3 si quiere volver al menu principal";
 
         return mensaje;
     }
 
-    public static void agregarPartido(MapeoAMuchos partidos, AVL equipos) {
+    public static void agregarPartido(MapeoAMuchos partidos, AVL equipos, Escritura logger) {
         Scanner scanner = new Scanner(System.in);
 
         String muestraEquipos = "";
         Lista colEquipos = equipos.listar();
+        int longitud = colEquipos.longitud();
 
-        for (int i = 0; i < colEquipos.longitud(); i++) {
-            muestraEquipos += colEquipos.recuperar(i) + ": " + (i + 1) + "; ";
+        for (int i = 1; i <= longitud; i++) {
+            muestraEquipos += colEquipos.recuperar(i) + ": " + i + "; ";
         }
 
         System.out.println(muestraEquipos);
         System.out.println("Ingrese el número del equipo 1");
         int eleccion1 = scanner.nextInt();
+        scanner.nextLine();
         Equipo eq1 = (Equipo) colEquipos.recuperar(eleccion1);
         String nomEq1 = eq1.getNombre();
 
         System.out.println(muestraEquipos);
         System.out.println("Ingrese el número del equipo 2");
         int eleccion2 = scanner.nextInt();
+        scanner.nextLine();
 
         if (eleccion2 != eleccion1) {
             Equipo eq2 = (Equipo) colEquipos.recuperar(eleccion2);
@@ -498,13 +549,13 @@ public class CopaAmerica2024 {
             }
 
             System.out.println("Ingrese la instancia del partido");
-            String ins = scanner.nextLine();
+            String ins = scanner.nextLine().toUpperCase();
 
             System.out.println("Ingrese la ciudad en la que se jugó el partido");
-            String ciu = scanner.nextLine();
+            String ciu = scanner.nextLine().toUpperCase();
 
             System.out.println("Ingrese el nombre del estadio");
-            String estadio = scanner.nextLine();
+            String estadio = scanner.nextLine().toUpperCase();
 
             System.out.println("Ingrese la cantidad de goles que marcó " + nomEq1);
             int golEq1 = scanner.nextInt();
@@ -516,8 +567,11 @@ public class CopaAmerica2024 {
             PartidoKey dominio = new PartidoKey(nomEq1, nomEq2);
             Partido partido = new Partido(ins, ciu, estadio, golEq1, golEq2);
 
-            partidos.insertar(dominio);
-            partidos.asociar(dominio, partido);
+            partidos.insertar(dominio, partido);
+
+            System.out.println("Se agregó con exito el partido");
+            logger.escribir("Se agregó el partido "+dominio.toString());
+
         } else {
             System.out.println("Partido inválido");
         }
@@ -569,9 +623,9 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el primer equipo");
-        String eq1 = scanner.nextLine();
+        String eq1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el segundo equipo");
-        String eq2 = scanner.nextLine();
+        String eq2 = scanner.nextLine().toUpperCase();
 
         if (eq1.compareTo(eq2) > 0) {
             String aux = eq1;
@@ -586,6 +640,8 @@ public class CopaAmerica2024 {
 
             if (partidos.pertenece(dominio)) {
                 System.out.println(partidos.obtenerValor(dominio));
+            } else {
+                System.out.println("Estos equipos no jugaron un partido entre sí");
             }
         }
     }
@@ -598,14 +654,14 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad origen");
-        String c1 = scanner.nextLine();
+        String c1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad destino");
-        String c2 = scanner.nextLine();
+        String c2 = scanner.nextLine().toUpperCase();
 
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
 
-        System.out.println(ciudades.caminoMasCorto(origen, destino).toString());
+        System.out.println("El camino mas corto es " + ciudades.caminoMasCorto(origen, destino).toString());
     }
 
     public static void menorTiempo(GrafoEtiquetado ciudades) {
@@ -613,9 +669,9 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad origen");
-        String c1 = scanner.nextLine();
+        String c1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad destino");
-        String c2 = scanner.nextLine();
+        String c2 = scanner.nextLine().toUpperCase();
 
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
@@ -631,11 +687,11 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad origen");
-        String c1 = scanner.nextLine();
+        String c1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad destino");
-        String c2 = scanner.nextLine();
+        String c2 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad a evitar");
-        String c3 = scanner.nextLine();
+        String c3 = scanner.nextLine().toUpperCase();
 
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
@@ -654,20 +710,21 @@ public class CopaAmerica2024 {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Ingrese el nombre de la ciudad origen");
-        String c1 = scanner.nextLine();
+        String c1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad destino");
-        String c2 = scanner.nextLine();
+        String c2 = scanner.nextLine().toUpperCase();
 
         Ciudad origen = new Ciudad(c1, false, false);
         Ciudad destino = new Ciudad(c2, false, false);
 
-        Lista caminos = ciudades.caminoMenorTiempo(origen, destino);
+        Lista caminos = ciudades.caminosTotales(origen, destino);
+        int longitudCam = caminos.longitud();
 
         System.out.println("Todos los caminos posibles desde " + c1 + " hasta " + c2 + ", son: ");
 
         Lista conAlojamiento = new Lista();
 
-        for (int i = 0; i < caminos.longitud(); i++) {
+        for (int i = 1; i <= longitudCam; i++) {
             Lista camino = (Lista) caminos.recuperar(i);
             System.out.println(camino.toString());
 
@@ -676,14 +733,16 @@ public class CopaAmerica2024 {
             }
         }
 
+        int longitudAl = conAlojamiento.longitud();
+
         if (conAlojamiento.esVacia()) {
             System.out.println("No hay ningun camino con alojamiento disponible");
         } else {
             System.out.println("Los caminos que tienen alojamiento son: ");
 
-            for (int i = 0; i < conAlojamiento.longitud(); i++) {
-                Lista camino = (Lista) conAlojamiento.recuperar(i);
-                System.out.println(camino.toString());
+            for (int i = 1; i <= longitudAl; i++) {
+                Lista caminoA = (Lista) conAlojamiento.recuperar(i);
+                System.out.println(caminoA.toString());
             }
         }
     }
@@ -692,28 +751,17 @@ public class CopaAmerica2024 {
         Lista listaEquipos = equipos.listar();
         AVL equiposPorGol = new AVL();
 
-        for (int i = 0; i < listaEquipos.longitud(); i++) {
-            EquipoGoles equipo = new EquipoGoles((Equipo) listaEquipos.recuperar(i));
+        int longitud = listaEquipos.longitud();
+
+        for (int i = 1; i <= longitud; i++) {
+            EquipoGoles equipo = new EquipoGoles((Equipo) listaEquipos.recuperar(1));
+            listaEquipos.eliminar(1);
             equiposPorGol.insertar(equipo);
         }
 
-        System.out.println("La lista de los equipos en orden de mas cantidad de goles a favor a menor es: "
+        System.out.println("La lista de los equipos en orden por cantidad de goles a favor de mayor a menor es: "
                 + equiposPorGol.toString());
         equiposPorGol.vaciar();
-        listaEquipos.vaciar();
-    }
-
-    private static void mostrarSistema(GrafoEtiquetado ciudades, AVL equipos, MapeoAMuchos partidos) {
-        /*
-         * Mostrar sistema: es una operación de debugging que permite ver todas las
-         * estructuras utilizadas con su contenido
-         * (grafo, AVL y Mapeo) para verificar, en cualquier momento de la ejecución del
-         * sistema, que se encuentren cargadas correctamente.
-         */
-
-        System.out.println("Grafo de ciudades: " + ciudades.toString());
-        System.out.println("AVL de equipos: " + equipos.toString());
-        System.out.println("Mapeo de partidos: " + partidos.toString());
     }
 
 }

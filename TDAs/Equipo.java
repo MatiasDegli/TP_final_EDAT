@@ -75,4 +75,16 @@ public class Equipo implements Comparable{
     public int compareTo(Object otro) {
         return nombre.compareTo(((Equipo) otro).getNombre());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean iguales = false;
+        Equipo otro = (Equipo) obj;
+        if(obj!=null){
+            if(nombre.equals(otro.nombre)){
+                iguales=true;
+            }
+        }
+        return iguales;
+    }
 }

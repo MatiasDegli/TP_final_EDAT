@@ -1,5 +1,8 @@
 package Estructuras;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import TDAs.Ciudad;
 
 public class GrafoEtiquetado {
@@ -55,46 +58,41 @@ public class GrafoEtiquetado {
         return buscado != null;
     }
 
-    private void eliminarAdyacente(NodoVert recorre, NodoVert buscado) {
-
-        NodoAdy adyacente = recorre.getPrimerAdy();
-        NodoAdy anterior = adyacente;
-
-        if (adyacente != null) {
-
-            if (adyacente.getVertice() == buscado) {
-                recorre.setPrimerAdy(adyacente.getSigAdyacente());
-            } else {
-
-                while (adyacente != null && adyacente.getVertice() != buscado) {
-                    anterior = adyacente;
-                    adyacente = adyacente.getSigAdyacente();
-                }
-
-                if (adyacente != null) {
-                    anterior.setSigAdyacente(adyacente.getSigAdyacente());
-                }
-            }
-        }
-    }
-
-    private void eliminarAux(NodoVert recorre, NodoVert anterior, NodoVert buscado) {
+    private void eliminarAux(NodoVert recorre, NodoVert anterior, NodoVert eliminar) {
 
         if (recorre != null) {
 
-            if (recorre == buscado) {
-                if (recorre == inicio) {
+            if (recorre.equals(eliminar)) {
+
+                if (recorre.equals(inicio)) {
+
+                    eliminarAdyacente(eliminar);
                     inicio = inicio.getSigVertice();
                 } else {
+
+                    eliminarAdyacente(eliminar);
                     anterior.setSigVertice(recorre.getSigVertice());
                 }
             }
 
-            eliminarAdyacente(recorre, buscado);
-
-            eliminarAux(recorre.getSigVertice(), recorre, buscado);
+            eliminarAux(recorre.getSigVertice(), recorre, eliminar);
         }
 
+    }
+
+    private void eliminarAdyacente(NodoVert eliminar) {
+
+        NodoAdy adyacente = eliminar.getPrimerAdy();
+
+        if (adyacente != null) {
+
+            while (adyacente != null) {
+                eliminarArcoAux(eliminar, adyacente.getVertice());
+                eliminarArcoAux(adyacente.getVertice(), eliminar);
+                adyacente = adyacente.getSigAdyacente();
+            }
+
+        }
     }
 
     public boolean existeVertice(Object vertice) {
@@ -102,7 +100,7 @@ public class GrafoEtiquetado {
 
         NodoVert recorre = inicio;
 
-        while (recorre != null && recorre.getElem().equals(vertice)) {
+        while (recorre != null && !recorre.getElem().equals(vertice)) {
             recorre = recorre.getSigVertice();
         }
 
@@ -181,7 +179,7 @@ public class GrafoEtiquetado {
         return exito;
     }
 
-    public void eliminarArcoAux(NodoVert origen, NodoVert destino) {
+    private void eliminarArcoAux(NodoVert origen, NodoVert destino) {
 
         if (origen != null) {
             NodoAdy adyacente = origen.getPrimerAdy();
@@ -192,7 +190,7 @@ public class GrafoEtiquetado {
                 adyacente = adyacente.getSigAdyacente();
             }
 
-            if (adyacente != null && adyacente == origen.getPrimerAdy()) {
+            if (adyacente != null && adyacente.equals(origen.getPrimerAdy())) {
                 origen.setPrimerAdy(adyacente.getSigAdyacente());
             } else if (anterior != null) {
                 if (adyacente != null) {
@@ -264,43 +262,6 @@ public class GrafoEtiquetado {
         }
 
         return exito;
-    }
-
-    public Lista caminoMasCorto(Object elemOrigen, Object elemDestino) {
-        // Devuelve una lista del camino de menor cantidad de nodos desde un nodo A a un
-        // nodo B
-
-        Lista actual = new Lista(), corto = new Lista();
-        NodoVert origen = ubicarVertice(elemOrigen);
-        actual.insertar(1, elemOrigen);
-
-        cortoAux(actual, corto, elemDestino, origen);
-
-        return corto;
-    }
-
-    private void cortoAux(Lista actual, Lista corto, Object elemDestino, NodoVert vertice) {
-        if (vertice != null) {
-            if (vertice.getElem().equals(elemDestino)) {
-                if (corto.esVacia() || actual.longitud() < corto.longitud()) {
-                    corto.vaciar();
-                    llenar(corto, actual);
-                }
-            } else {
-                NodoAdy adyacente = vertice.getPrimerAdy();
-                while (adyacente != null) {
-                    NodoVert siguienteVertice = adyacente.getVertice();
-                    if (actual.localizar(siguienteVertice.getElem()) == -1) {
-                        actual.insertar(actual.longitud() + 1, siguienteVertice.getElem());
-
-                        cortoAux(actual, corto, elemDestino, siguienteVertice);
-
-                        actual.eliminar(actual.longitud());
-                    }
-                    adyacente = adyacente.getSigAdyacente();
-                }
-            }
-        }
     }
 
     private void llenar(Lista aLlenar, Lista llena) {
@@ -418,6 +379,53 @@ public class GrafoEtiquetado {
         }
     }
 
+    public Lista caminoMasCorto(Object elemOrigen, Object elemDestino) {
+        // Creamos una cola para almacenar caminos
+        Cola cola = new Cola();
+        Lista caminoCorto = new Lista();
+        Lista caminoInicial = new Lista();
+
+        caminoInicial.insertar(1, elemOrigen);
+        // Ponemos el camino inicial
+        cola.poner(caminoInicial); 
+
+        while (!cola.esVacia()) {
+            // Obtenemos el camino en el frente de la cola y lo sacamos
+            Lista caminoActual = (Lista) cola.obtenerFrente();
+            cola.sacar();
+
+            // Obtenemos el último elemento del camino
+            Object ultimoElem = caminoActual.recuperar(caminoActual.longitud());
+
+            // Si el último elemento es el destino, retornamos este camino
+            if (ultimoElem.equals(elemDestino)) {
+                caminoCorto = caminoActual;
+                cola.vaciar();
+
+            } else {
+                // Buscamos en el grafo el nodo correspondiente al último elemento
+                NodoVert nodo = ubicarVertice(ultimoElem);
+
+                if (nodo != null) {
+                    NodoAdy adyacente = nodo.getPrimerAdy();
+                    
+                    while (adyacente != null) {
+                        Object elemActual = adyacente.getVertice().getElem();
+                        
+                        if (caminoActual.localizar(elemActual) == -1) {
+                            Lista nuevoCamino = caminoActual.clone();
+                            nuevoCamino.insertar(nuevoCamino.longitud() + 1, elemActual);                                                    
+                            cola.poner(nuevoCamino);
+                        }
+                        adyacente = adyacente.getSigAdyacente();
+                    }
+                }
+            }
+        }
+        
+        return caminoCorto;
+    }
+
     public boolean esVacio() {
         return inicio == null;
     }
@@ -504,72 +512,95 @@ public class GrafoEtiquetado {
         NodoVert aux = inicio;
 
         if (aux != null) {
-            Ciudad ciudadActual = (Ciudad) aux.getElem();
 
-            while (aux != null && ciudadActual.compareTo(ciudad) != 0) {
-                ciudadActual = (Ciudad) aux.getElem();
+            while (aux != null && ((Ciudad) aux.getElem()).compareTo(ciudad) != 0) {
                 aux = aux.getSigVertice();
             }
         }
-        
+
         return aux;
     }
 
-    public Ciudad obtenerCiudad(Ciudad ciudad){
+    public Ciudad obtenerCiudad(Ciudad ciudad) {
         NodoVert aux = inicio;
         Ciudad ciudadEncontrada = null;
 
-        while(aux!=null && ((Ciudad) aux.getElem()).compareTo(ciudad)!=0){
-            aux=aux.getSigVertice();
+        while (aux != null && ((Ciudad) aux.getElem()).compareTo(ciudad) != 0) {
+            aux = aux.getSigVertice();
         }
 
-        if(aux!=null){
+        if (aux != null) {
             ciudadEncontrada = (Ciudad) aux.getElem();
         }
 
         return ciudadEncontrada;
     }
 
+    public boolean existeCiudad(Ciudad ciudad) {
+        boolean exito = false;
+
+        NodoVert recorre = inicio;
+        String nombre = ((Ciudad) recorre.getElem()).getNombre();
+
+        while (recorre != null && !nombre.equals(ciudad.getNombre())) {
+            nombre = ((Ciudad) recorre.getElem()).getNombre();
+            recorre = recorre.getSigVertice();
+        }
+
+        if (recorre != null) {
+            exito = true;
+        }
+
+        return exito;
+    }
+
     public Lista caminoMenorTiempo(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
         Lista actual = new Lista(), rapida = new Lista();
-        NodoVert origen = ubicarVertice(ciudadOrigen);
-        NodoVert destino = ubicarVertice(ciudadDestino);
+        NodoVert origen = ubicarCiudad(ciudadOrigen);
+        NodoVert destino = ubicarCiudad(ciudadDestino);
         int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
-        actual.insertar(1, origen);
 
-        menorTiempoAux(origen, destino, actual, rapida, 0, tiempoMenor);
+        rapida = menorTiempoAux(origen, destino, actual, rapida, 0, tiempoMenor);
 
         return rapida;
     }
 
-    private void menorTiempoAux(NodoVert origen, NodoVert destino, Lista actual, Lista rapida, int tiempoActual,
+    private Lista menorTiempoAux(NodoVert recorre, NodoVert destino, Lista actual, Lista rapida, int tiempoActual,
             int[] tiempoMenor) {
 
-        if (origen != null) {
-            if (origen.equals(destino)) {
-                if (rapida.esVacia() || tiempoActual < tiempoMenor[0]) {
-                    rapida.vaciar();
-                    llenar(rapida, actual);
-                    tiempoMenor[0] = tiempoActual;
-                    tiempoActual = 0;
-                }
-            } else {
-                NodoAdy adyacente = origen.getPrimerAdy();
+        actual.insertar(actual.longitud() + 1, recorre.getElem());
 
-                while (adyacente != null) {
-                    NodoVert siguienteVertice = adyacente.getVertice();
-                    int tiempoNuevo = tiempoActual + (int) adyacente.getEtiqueta();
+        System.out.println("Lista actual: " + actual.toString());
+        System.out.println("Lista rapida: " + rapida.toString());
+        System.out.println("Tiempo actual: " + tiempoActual + " y tiempo menor: " + tiempoMenor[0]);
 
-                    if (actual.localizar(siguienteVertice.getElem()) == -1) {
-                        // La ciudad no esta en la lista de ciudades visitadas
-                        actual.insertar(actual.longitud() + 1, siguienteVertice);
-                        menorTiempoAux(siguienteVertice, destino, actual, rapida, tiempoNuevo, tiempoMenor);
-                        actual.eliminar(actual.longitud());
-                    }
-                    adyacente = adyacente.getSigAdyacente();
+        if (recorre.getElem().equals(destino.getElem())) {
+            if (tiempoActual < tiempoMenor[0]) {
+                System.out.println(" ----------------- Modificacion -----------------");
+                rapida = actual.clone();
+                tiempoMenor[0] = tiempoActual;
+            }
+        } else {
+            NodoAdy adyacente = recorre.getPrimerAdy();
+
+            while (adyacente != null) {
+                NodoVert siguienteVertice = adyacente.getVertice();
+
+                if (actual.localizar(siguienteVertice.getElem()) == -1
+                        && tiempoActual + (int) adyacente.getEtiqueta() < tiempoMenor[0] && siguienteVertice != null) {
+                    // La ciudad no esta en la lista de ciudades visitadas y la el camino es mas
+                    // rapido que el almacenado
+
+                    rapida = menorTiempoAux(siguienteVertice, destino, actual, rapida,
+                            tiempoActual + (int) adyacente.getEtiqueta(), tiempoMenor);
                 }
+                adyacente = adyacente.getSigAdyacente();
             }
         }
+
+        actual.eliminar(actual.longitud());
+
+        return rapida;
     }
 
     public Lista caminoRapidoAlt(Ciudad ciudadOrigen, Ciudad ciudadDestino, Ciudad ciudadEvitar) {
@@ -577,80 +608,87 @@ public class GrafoEtiquetado {
         NodoVert origen = ubicarCiudad(ciudadOrigen);
         NodoVert destino = ubicarCiudad(ciudadDestino);
         NodoVert evitar = ubicarCiudad(ciudadEvitar);
-        int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
-        actual.insertar(1, origen);
 
-        caminoRapidoAux(origen, destino, evitar, actual, rapida, 0, tiempoMenor);
+        int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
+
+        rapida = menorRapidoAux(origen, destino, evitar, actual, rapida, 0, tiempoMenor);
 
         return rapida;
     }
 
-    private void caminoRapidoAux(NodoVert origen, NodoVert destino, NodoVert evitar, Lista actual, Lista rapida,
+    private Lista menorRapidoAux(NodoVert recorre, NodoVert destino, NodoVert evitar, Lista actual, Lista rapida,
             int tiempoActual,
             int[] tiempoMenor) {
 
-        if (origen != null) {
-            if (origen.equals(destino)) {
-                if (rapida.esVacia() || tiempoActual < tiempoMenor[0]) {
-                    rapida.vaciar();
-                    llenar(rapida, actual);
-                    tiempoMenor[0] = tiempoActual;
-                    // tiempoActual = 0;
+        actual.insertar(actual.longitud() + 1, recorre.getElem());
+
+        System.out.println("Lista actual: " + actual.toString());
+        System.out.println("Lista rapida: " + rapida.toString());
+        System.out.println("Tiempo actual: " + tiempoActual + " y tiempo menor: " + tiempoMenor[0]);
+
+        if (recorre.getElem().equals(destino.getElem())) {
+            if (tiempoActual < tiempoMenor[0]) {
+                System.out.println(" ----------------- Modificacion -----------------");
+                rapida = actual.clone();
+                tiempoMenor[0] = tiempoActual;
+            }
+        } else {
+            NodoAdy adyacente = recorre.getPrimerAdy();
+
+            while (adyacente != null) {
+                NodoVert siguienteVertice = adyacente.getVertice();
+
+                if (actual.localizar(siguienteVertice.getElem()) == -1
+                        && tiempoActual + (int) adyacente.getEtiqueta() < tiempoMenor[0] && siguienteVertice != null
+                        && !siguienteVertice.equals(evitar)) {
+                    // La ciudad no esta en la lista de ciudades visitadas, el camino es mas
+                    // rapido que el almacenado y no pasa por la ciudad a evitar
+
+                    rapida = menorTiempoAux(siguienteVertice, destino, actual, rapida,
+                            tiempoActual + (int) adyacente.getEtiqueta(), tiempoMenor);
                 }
-            } else {
-                NodoAdy adyacente = origen.getPrimerAdy();
-
-                while (adyacente != null) {
-                    NodoVert siguienteVertice = adyacente.getVertice();
-
-                    if (!siguienteVertice.equals(evitar)) {
-                        int tiempoNuevo = tiempoActual + (int) adyacente.getEtiqueta();
-
-                        if (actual.localizar(siguienteVertice.getElem()) == -1) {
-                            // La ciudad no esta en la lista de ciudades visitadas
-                            actual.insertar(actual.longitud() + 1, siguienteVertice);
-                            caminoRapidoAux(siguienteVertice, destino, evitar, actual, rapida, tiempoNuevo,
-                                    tiempoMenor);
-                            actual.eliminar(actual.longitud());
-                        }
-                    }
-                    adyacente = adyacente.getSigAdyacente();
-                }
+                adyacente = adyacente.getSigAdyacente();
             }
         }
+
+        actual.eliminar(actual.longitud());
+
+        return rapida;
     }
 
     public Lista caminosTotales(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
         Lista caminos = new Lista(), actual = new Lista();
-        NodoVert origen = ubicarVertice(ciudadOrigen);
-        NodoVert destino = ubicarVertice(ciudadDestino);
-        actual.insertar(1, origen);
+        NodoVert origen = ubicarCiudad(ciudadOrigen);
+        NodoVert destino = ubicarCiudad(ciudadDestino);
 
-        totalesAux(origen, destino, caminos, actual);
+        caminos = totalesAux(origen, destino, caminos, actual);
 
         return caminos;
     }
 
-    private void totalesAux(NodoVert origen, NodoVert destino, Lista caminos, Lista actual) {
+    private Lista totalesAux(NodoVert recorre, NodoVert destino, Lista caminos, Lista actual) {
 
-        if (origen != null) {
-            if (origen.equals(destino)) {
-                caminos.insertar(caminos.longitud()+1, actual.clone());                
-            } else {
-                NodoAdy adyacente = origen.getPrimerAdy();
+        actual.insertar(actual.longitud() + 1, recorre.getElem());
 
-                while (adyacente != null) {
-                    NodoVert siguienteVertice = adyacente.getVertice();
+        if (recorre.getElem().equals(destino.getElem())) {
+            caminos.insertar(caminos.longitud() + 1, actual.clone());
+        } else {
+            NodoAdy adyacente = recorre.getPrimerAdy();
+            while (adyacente != null) {
 
-                    if (actual.localizar(siguienteVertice.getElem()) == -1) {
-                        // La ciudad no esta en la lista de ciudades visitadas
-                        actual.insertar(actual.longitud() + 1, siguienteVertice);
-                        totalesAux(siguienteVertice, destino, caminos, actual);
-                        actual.eliminar(actual.longitud());
-                    }
-                    adyacente = adyacente.getSigAdyacente();
+                NodoVert siguienteVertice = adyacente.getVertice();
+
+                if (actual.localizar(siguienteVertice.getElem()) < 0 && siguienteVertice != null) {
+                    // La ciudad no está en la lista de visitados
+                    caminos = totalesAux(siguienteVertice, destino, caminos, actual);
                 }
+                adyacente = adyacente.getSigAdyacente();
             }
         }
+
+        actual.eliminar(actual.longitud());
+
+        return caminos;
     }
+
 }

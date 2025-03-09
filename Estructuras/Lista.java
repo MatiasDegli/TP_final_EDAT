@@ -105,12 +105,12 @@ public class Lista {
         else{
             Nodo aux=cabecera;
             
-            while(pos < longitud && aux.getElem()!=elem){
+            while(pos < longitud && !aux.getElem().equals(elem)){
                 aux=aux.getEnlace();
                 pos++;
             }
             
-            if(aux.getElem()!=elem){
+            if(!aux.getElem().equals(elem)){
                 pos=-1;
             }
         }
@@ -299,14 +299,22 @@ public class Lista {
 
     public boolean tieneAlojamiento(){
         boolean exito = false;
+        Nodo aux = cabecera.getEnlace();
 
-        for(int i=0; i<longitud; i++){
-            Ciudad actual = (Ciudad) recuperar(i);
+        //System.out.println(" --------------- entra al metodo --------------- ");
+        //System.out.println("La ciudad actual es distinto de null: "+ (aux != null));
+
+        while(!exito && aux!=null){
+            //System.out.println(" ---------------- entro while ---------------- ");
+            Ciudad actual = (Ciudad) aux.getElem();
+
             if(actual.getDisponibilidad()){
                 exito=true;
             }
+            
+            aux = aux.getEnlace();
         }
-
+        
         return exito;
     }
     

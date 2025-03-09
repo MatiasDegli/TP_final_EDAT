@@ -1,5 +1,7 @@
 package TDAs;
 
+import java.util.Objects;
+
 public class Ciudad implements Comparable {
 
     private String nombre;
@@ -35,6 +37,23 @@ public class Ciudad implements Comparable {
     @Override
     public int compareTo(Object otra) {
         return nombre.compareTo(((Ciudad) otra).getNombre());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean iguales = false;
+        Ciudad otro = (Ciudad) obj;
+        if(obj!=null){
+            if(nombre.equals(otro.nombre)){
+                iguales=true;
+            }
+        }
+        return iguales;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
     }
 
 }
