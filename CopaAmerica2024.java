@@ -746,7 +746,7 @@ public class CopaAmerica2024 {
             }
         }
     }
-
+    
     public static void listaGoles(AVL equipos) {
         Lista listaEquipos = equipos.listar();
         AVL equiposPorGol = new AVL();

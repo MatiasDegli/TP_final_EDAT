@@ -414,7 +414,8 @@ public class GrafoEtiquetado {
                         
                         if (caminoActual.localizar(elemActual) == -1) {
                             Lista nuevoCamino = caminoActual.clone();
-                            nuevoCamino.insertar(nuevoCamino.longitud() + 1, elemActual);                                                    
+                            nuevoCamino.insertar(nuevoCamino.longitud() + 1, elemActual);
+                            System.out.println("El camino actual es: "+nuevoCamino);
                             cola.poner(nuevoCamino);
                         }
                         adyacente = adyacente.getSigAdyacente();
@@ -491,10 +492,10 @@ public class GrafoEtiquetado {
             while (adyacente != null) {
 
                 if (adyacente.getSigAdyacente() != null) {
-                    msj += recorre.getElem().toString() + " --" + adyacente.getEtiqueta() + "->";
+                    msj += recorre.getElem().toString() + " -" + adyacente.getEtiqueta() + "->";
                     msj += " " + adyacente.getVertice().getElem().toString() + ", ";
                 } else {
-                    msj += recorre.getElem().toString() + " --" + adyacente.getEtiqueta() + "->";
+                    msj += recorre.getElem().toString() + " -" + adyacente.getEtiqueta() + "->";
                     msj += " " + adyacente.getVertice().getElem().toString();
                 }
                 adyacente = adyacente.getSigAdyacente();

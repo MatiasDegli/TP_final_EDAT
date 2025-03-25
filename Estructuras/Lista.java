@@ -140,6 +140,7 @@ public class Lista {
         Nodo aux = cabecera;                
         Nodo enlaza = new Nodo(aux.getElem(), null);
         clon.cabecera=enlaza;
+        clon.longitud=1;
         aux=aux.getEnlace();
             
         while(aux!=null){
@@ -147,6 +148,7 @@ public class Lista {
             enlaza.setEnlace(nuevo);
             enlaza=enlaza.getEnlace();
             aux=aux.getEnlace();
+            clon.longitud++;
         }
         
         return clon;
