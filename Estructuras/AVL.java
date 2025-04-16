@@ -67,13 +67,13 @@ public class AVL {
             raiz = new NodoAVL(newElem, null, null);
             exito = true;
         } else {
-            exito = insertarAux(newElem, raiz);
+            exito = insertarAux(newElem, raiz, null);
         }
 
         return exito;
     }
 
-    private boolean insertarAux(Comparable elem, NodoAVL recorre) {
+    private boolean insertarAux(Comparable elem, NodoAVL recorre, NodoAVL padre) {
         boolean exito = true;
 
         if (recorre != null) {
@@ -81,26 +81,26 @@ public class AVL {
                 if (recorre.getIzquierdo() == null) {
                     recorre.setIzquierdo(new NodoAVL(elem, null, null));
                 } else {
-                    exito = insertarAux(elem, recorre.getIzquierdo());
+                    exito = insertarAux(elem, recorre.getIzquierdo(), recorre);
                 }
             } else if (recorre.getElem().compareTo(elem) < 0) {
                 if (recorre.getDerecho() == null) {
                     recorre.setDerecho(new NodoAVL(elem, null, null));
                 } else {
-                    exito = insertarAux(elem, recorre.getDerecho());
+                    exito = insertarAux(elem, recorre.getDerecho(), recorre);
                 }
             } else {
                 exito = false;
             }
 
             recorre.recalcularAltura();
-            recorre = balancear(recorre);
+            recorre = balancear(recorre, padre);
         }
 
         return exito;
     }
 
-    private NodoAVL balancear(NodoAVL recorre) {
+    private NodoAVL balancear(NodoAVL recorre, NodoAVL padre) {
 
         if (recorre != null) {
             int balance = obtenerBalance(recorre);
@@ -130,19 +130,19 @@ public class AVL {
 
                 if (balance == 2) {
                     if (balanceHijo == -1) {
-                        recorre.setIzquierdo(rotacionIzquierda(hijo));
-                        recorre = rotacionDerecha(recorre);
+                        recorre.setIzquierdo(rotacionIzquierda(hijo, recorre));
+                        recorre = rotacionDerecha(recorre, padre);
                     } else {
 
-                        recorre = rotacionDerecha(recorre);
+                        recorre = rotacionDerecha(recorre, padre);
                     }
                 } else if (balance == -2) {
 
                     if (balanceHijo == 1) {
-                        recorre.setDerecho(rotacionDerecha(hijo));
-                        recorre = rotacionIzquierda(recorre);
+                        recorre.setDerecho(rotacionDerecha(hijo, recorre));
+                        recorre = rotacionIzquierda(recorre, padre);
                     } else {
-                        recorre = rotacionIzquierda(recorre);
+                        recorre = rotacionIzquierda(recorre, padre);
                     }
                 }
             }
@@ -151,28 +151,7 @@ public class AVL {
         return recorre;
     }
 
-    private NodoAVL obtenerPadre(Comparable elem, NodoAVL recorre) {
-        NodoAVL padre = null;
-
-        if (!recorre.getElem().equals(elem)) {
-            if (recorre != null) {
-
-                if (recorre.getIzquierdo() != null && recorre.getIzquierdo().getElem().compareTo(elem) == 0 ||
-                        recorre.getDerecho() != null && recorre.getDerecho().getElem().compareTo(elem) == 0) {
-
-                    padre = recorre;
-                } else if (recorre.getElem().compareTo(elem) < 0) {
-                    padre = obtenerPadre(elem, recorre.getDerecho());
-                } else {
-                    padre = obtenerPadre(elem, recorre.getIzquierdo());
-                }
-            }
-        }
-
-        return padre;
-    }
-
-    private NodoAVL rotacionIzquierda(NodoAVL pivote) {
+    private NodoAVL rotacionIzquierda(NodoAVL pivote, NodoAVL padre) {
 
         NodoAVL HD = pivote.getDerecho();
         pivote.setDerecho(HD.getIzquierdo());
@@ -183,18 +162,17 @@ public class AVL {
         if (pivote == raiz) {
             raiz = HD;
         } else {
-            NodoAVL padre = obtenerPadre(pivote.getElem(), raiz);
             if (padre.getIzquierdo() == pivote) {
                 padre.setIzquierdo(HD);
             } else {
                 padre.setDerecho(HD);
-            }
+            }   
         }
 
         return HD;
     }
 
-    private NodoAVL rotacionDerecha(NodoAVL pivote) {
+    private NodoAVL rotacionDerecha(NodoAVL pivote, NodoAVL padre) {
 
         NodoAVL HI = pivote.getIzquierdo();
         pivote.setIzquierdo(HI.getDerecho());
@@ -205,7 +183,6 @@ public class AVL {
         if (pivote == raiz) {
             raiz = HI;
         } else {
-            NodoAVL padre = obtenerPadre(pivote.getElem(), raiz);
             if (padre.getIzquierdo() == pivote) {
                 padre.setIzquierdo(HI);
             } else {
@@ -235,12 +212,12 @@ public class AVL {
     public boolean eliminar(Comparable elem) {
         boolean exito = false;
 
-        exito = eliminarAux(elem, raiz);
+        exito = eliminarAux(elem, raiz, null, null);
 
         return exito;
     }
 
-    private boolean eliminarAux(Comparable elem, NodoAVL recorre) {
+    private boolean eliminarAux(Comparable elem, NodoAVL recorre, NodoAVL padre, NodoAVL abuelo) {
         boolean exito = false;
 
         if (recorre != null) {
@@ -249,33 +226,43 @@ public class AVL {
 
                 NodoAVL izq = recorre.getIzquierdo();
                 NodoAVL der = recorre.getDerecho();
-                NodoAVL padre = obtenerPadre(elem, raiz);
 
                 if (padre == null) {
                     // se quiere eliminar la raiz
                     eliminarRaiz(izq, der, recorre);
                 } else {
                     if (izq == null && der == null) {
-                        sinHijo(padre, recorre);
+                        // eliminar Nodo sin hijos
+                        sinHijo(recorre, padre);
                     } else if (izq != null && der != null) {
-                        dosHijos(recorre);
+                        // eliminar Nodo con dos hijos 
+                        dosHijos(recorre, padre);
                     } else {
-                        unHijo(padre, recorre);
+                        // eliminar Nodo con un hijo
+                        unHijo(recorre, padre);
                     }
 
                     padre.recalcularAltura();
-                    padre = balancear(padre);
+                    padre = balancear(padre, abuelo);
                 }
+                
+                exito=true;
+
             } else if (recorre.getElem().compareTo(elem) < 0) {
-                exito = eliminarAux(elem, recorre.getDerecho());
+                exito = eliminarAux(elem, recorre.getDerecho(), recorre, padre);
             } else {
-                exito = eliminarAux(elem, recorre.getIzquierdo());
+                exito = eliminarAux(elem, recorre.getIzquierdo(), recorre, padre);
+            }
+
+            if(exito){
+                recorre.recalcularAltura();
+                recorre = balancear(recorre, padre);
             }
         }
 
         return exito;
     }
-
+    
     private void eliminarRaiz(NodoAVL izq, NodoAVL der, NodoAVL recorre){
         if (izq == null && der == null) {
             // La raíz es única: el árbol queda vacío.
@@ -288,11 +275,11 @@ public class AVL {
             raiz = der;
         } else {
             // La raíz tiene dos hijos.
-            dosHijos(recorre);
+            dosHijos(recorre, null);
         }
     }
 
-    private void sinHijo(NodoAVL padre, NodoAVL actual) {
+    private void sinHijo(NodoAVL actual, NodoAVL padre) {
 
         if (padre.getIzquierdo() == actual) {
             padre.setIzquierdo(null);
@@ -301,7 +288,7 @@ public class AVL {
         }
     }
 
-    private void unHijo(NodoAVL padre, NodoAVL actual) {
+    private void unHijo(NodoAVL actual, NodoAVL padre) {
 
         NodoAVL izq = actual.getIzquierdo();
         NodoAVL der = actual.getDerecho();
@@ -314,7 +301,7 @@ public class AVL {
                 padre.setDerecho(izq);
             }
             padre.recalcularAltura();
-            balancear(padre);
+            // balancear(padre); parece innecesario ya que cuando vuele a eliminarAux se balancea
         } else if (izq == null && der != null) {
 
             if (padre.getIzquierdo() == actual) {
@@ -325,16 +312,38 @@ public class AVL {
         }
     }
 
-    private void dosHijos(NodoAVL actual) {
+    // private void dosHijos(NodoAVL actual, NodoAVL padreActual) {
+    //     NodoAVL abueloSucesor = padreActual;
+    //     NodoAVL padreSucesor = actual; // Padre del sucesor comienza como el nodo actual
+    //     NodoAVL sucesor = actual.getDerecho();
+    
+    //     Buscar el sucesor inorder (más izquierdo del subárbol derecho)
+    //     while (sucesor.getIzquierdo() != null) {
+    //         abueloSucesor = padreSucesor;
+    //         padreSucesor = sucesor;
+    //         sucesor = sucesor.getIzquierdo();
+    //     }
+        
+    //     Eliminar el sucesor usando su padre real
+    //     eliminarAux(sucesor.getElem(), sucesor, padreSucesor, abueloSucesor);
+    //     actual.setElem(sucesor.getElem());
+    // }
 
-        NodoAVL der = actual.getDerecho();
-
-        while (der.getIzquierdo() != null) {
-            der = der.getIzquierdo();
+    private void dosHijos(NodoAVL actual, NodoAVL padreActual) {
+        NodoAVL abueloSucesor = padreActual;
+        NodoAVL padreSucesor = actual; // Padre del sucesor comienza como el nodo actual
+        NodoAVL sucesor = actual.getIzquierdo();
+    
+        // Buscar el sucesor inorder (más izquierdo del subárbol derecho)
+        while (sucesor.getDerecho() != null) {
+            abueloSucesor = padreSucesor;
+            padreSucesor = sucesor;
+            sucesor = sucesor.getDerecho();
         }
-
-        eliminarAux(der.getElem(), der);
-        actual.setElem(der.getElem());
+        
+        // Eliminar el sucesor usando su padre real
+        eliminarAux(sucesor.getElem(), sucesor, padreSucesor, abueloSucesor);
+        actual.setElem(sucesor.getElem());
     }
 
     // private void dosHijos(NodoAVL actual) {

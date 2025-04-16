@@ -197,8 +197,8 @@ public class CopaAmerica2024 {
         String c2 = datos[2];
         int mins = Integer.parseInt(datos[3]);
 
-        Ciudad origen = (Ciudad) ciudades.obtenerCiudad(new Ciudad(c1, false, false));
-        Ciudad destino = (Ciudad) ciudades.obtenerCiudad(new Ciudad(c2, false, false));
+        Ciudad origen = new Ciudad(c1, false, false);
+        Ciudad destino = new Ciudad(c2, false, false);
 
         ciudades.insertarArco(origen, destino, mins);
     }
@@ -274,7 +274,7 @@ public class CopaAmerica2024 {
         System.out.println("Ingrese el nombre de la ciudad");
         String nombre = scanner.nextLine().toUpperCase();
 
-        if (ciudades.existeCiudad(new Ciudad(nombre, false, false))) {
+        if (ciudades.existeElem(nombre)) {
             System.out.println("La ciudad ya es parte del mapa\n");
         } else {
             System.out.println("Indique la disponibilidad");
@@ -298,11 +298,8 @@ public class CopaAmerica2024 {
         System.out.println("Ingrese el nombre de la ciudad");
         String nombre = scanner.nextLine();
 
-        Ciudad ciudad = new Ciudad(nombre, false, false);
-        ciudad = ciudades.obtenerCiudad(ciudad);
-
-        if (ciudad != null) {
-            ciudades.eliminarVertice(ciudad);
+        if (ciudades.existeElem(nombre)) {
+            ciudades.eliminarVertice(nombre);
             System.out.println("La ciudad fue eliminada con exito");
 
             logger.escribir("Se eliminó la ciudad "+nombre);
@@ -317,7 +314,7 @@ public class CopaAmerica2024 {
         System.out.println("Ingrese el nombre de la ciudad");
         String nombre = scanner.nextLine().toUpperCase();
         Ciudad ciudad = new Ciudad(nombre, false, false);
-        ciudad = ciudades.obtenerCiudad(ciudad);
+        ciudad = (Ciudad) ciudades.getElem(ciudad);
 
         if (ciudad != null) {
             String opcion = "";
@@ -351,7 +348,8 @@ public class CopaAmerica2024 {
                 }
             }
             System.out.println("La ciudad se modifico con exito");
-        } else {
+        } 
+        else {
             System.out.println("La ciudad no es parte del mapa");
         }
     }
@@ -567,7 +565,7 @@ public class CopaAmerica2024 {
             PartidoKey dominio = new PartidoKey(nomEq1, nomEq2);
             Partido partido = new Partido(ins, ciu, estadio, golEq1, golEq2);
 
-            partidos.insertar(dominio, partido);
+            partidos.asociar(dominio, partido);
 
             System.out.println("Se agregó con exito el partido");
             logger.escribir("Se agregó el partido "+dominio.toString());
@@ -699,7 +697,7 @@ public class CopaAmerica2024 {
 
         System.out.println(ciudades.caminoRapidoAlt(origen, destino, evitar).toString());
     }
-
+    
     public static void caminosCompleto(GrafoEtiquetado ciudades) {
         /*
          * Obtener todos los caminos posibles para llegar de A a B, mostrarlos y luego
@@ -708,7 +706,7 @@ public class CopaAmerica2024 {
          * por la que tenga que pasar camino a ella
          */
         Scanner scanner = new Scanner(System.in);
-
+        String caminosAlojamiento = "";
         System.out.println("Ingrese el nombre de la ciudad origen");
         String c1 = scanner.nextLine().toUpperCase();
         System.out.println("Ingrese el nombre de la ciudad destino");
@@ -722,31 +720,43 @@ public class CopaAmerica2024 {
 
         System.out.println("Todos los caminos posibles desde " + c1 + " hasta " + c2 + ", son: ");
 
-        Lista conAlojamiento = new Lista();
-
         for (int i = 1; i <= longitudCam; i++) {
-            Lista camino = (Lista) caminos.recuperar(i);
-            System.out.println(camino.toString());
+            
+            Lista camino = (Lista) caminos.recuperar(1);            
+            int longActual = camino.longitud();
 
-            if (camino.tieneAlojamiento()) {
-                conAlojamiento.insertar(conAlojamiento.longitud() + 1, camino);
+            String caminoActual = "";
+            boolean tieneAlojamiento = false;
+
+            for(int j = 1; j <= longActual; j ++){
+                Ciudad ciudadActual = (Ciudad) camino.recuperar(1);
+                System.out.print(ciudadActual.toString()+ " ");
+                caminoActual += ciudadActual.toString()+ " ";
+                if(ciudadActual.getDisponibilidad()){
+                    tieneAlojamiento=true;
+                }
+                camino.eliminar(1);
             }
+            
+            System.out.println();
+
+            if(tieneAlojamiento){
+                caminosAlojamiento += caminoActual + "\n";
+            }
+
+            caminos.eliminar(1);
         }
 
-        int longitudAl = conAlojamiento.longitud();
-
-        if (conAlojamiento.esVacia()) {
-            System.out.println("No hay ningun camino con alojamiento disponible");
-        } else {
-            System.out.println("Los caminos que tienen alojamiento son: ");
-
-            for (int i = 1; i <= longitudAl; i++) {
-                Lista caminoA = (Lista) conAlojamiento.recuperar(i);
-                System.out.println(caminoA.toString());
-            }
+        if(caminosAlojamiento==""){
+            System.out.println("No hay caminos con alojamiento disponible");
         }
+        else{
+            System.out.println("\nLos caminos con alojamiento disponible son los siguientes: \n");
+            System.out.println(caminosAlojamiento);
+        }
+        
     }
-    
+
     public static void listaGoles(AVL equipos) {
         Lista listaEquipos = equipos.listar();
         AVL equiposPorGol = new AVL();

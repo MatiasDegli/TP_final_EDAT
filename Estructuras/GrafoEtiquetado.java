@@ -1,10 +1,5 @@
 package Estructuras;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
-import TDAs.Ciudad;
-
 public class GrafoEtiquetado {
 
     private NodoVert inicio;
@@ -48,8 +43,8 @@ public class GrafoEtiquetado {
         return aux;
     }
 
-    public boolean eliminarVertice(Object vertice) {
-        NodoVert buscado = ubicarVertice(vertice);
+    public boolean eliminarVertice(Object elem) {
+        NodoVert buscado = ubicarVertice(elem);
 
         if (buscado != null) {
             eliminarAux(inicio, inicio, buscado);
@@ -62,9 +57,9 @@ public class GrafoEtiquetado {
 
         if (recorre != null) {
 
-            if (recorre.equals(eliminar)) {
+            if (recorre == eliminar) {
 
-                if (recorre.equals(inicio)) {
+                if (recorre == inicio) {
 
                     eliminarAdyacente(eliminar);
                     inicio = inicio.getSigVertice();
@@ -87,7 +82,6 @@ public class GrafoEtiquetado {
         if (adyacente != null) {
 
             while (adyacente != null) {
-                eliminarArcoAux(eliminar, adyacente.getVertice());
                 eliminarArcoAux(adyacente.getVertice(), eliminar);
                 adyacente = adyacente.getSigAdyacente();
             }
@@ -379,54 +373,6 @@ public class GrafoEtiquetado {
         }
     }
 
-    public Lista caminoMasCorto(Object elemOrigen, Object elemDestino) {
-        // Creamos una cola para almacenar caminos
-        Cola cola = new Cola();
-        Lista caminoCorto = new Lista();
-        Lista caminoInicial = new Lista();
-
-        caminoInicial.insertar(1, elemOrigen);
-        // Ponemos el camino inicial
-        cola.poner(caminoInicial); 
-
-        while (!cola.esVacia()) {
-            // Obtenemos el camino en el frente de la cola y lo sacamos
-            Lista caminoActual = (Lista) cola.obtenerFrente();
-            cola.sacar();
-
-            // Obtenemos el último elemento del camino
-            Object ultimoElem = caminoActual.recuperar(caminoActual.longitud());
-
-            // Si el último elemento es el destino, retornamos este camino
-            if (ultimoElem.equals(elemDestino)) {
-                caminoCorto = caminoActual;
-                cola.vaciar();
-
-            } else {
-                // Buscamos en el grafo el nodo correspondiente al último elemento
-                NodoVert nodo = ubicarVertice(ultimoElem);
-
-                if (nodo != null) {
-                    NodoAdy adyacente = nodo.getPrimerAdy();
-                    
-                    while (adyacente != null) {
-                        Object elemActual = adyacente.getVertice().getElem();
-                        
-                        if (caminoActual.localizar(elemActual) == -1) {
-                            Lista nuevoCamino = caminoActual.clone();
-                            nuevoCamino.insertar(nuevoCamino.longitud() + 1, elemActual);
-                            System.out.println("El camino actual es: "+nuevoCamino);
-                            cola.poner(nuevoCamino);
-                        }
-                        adyacente = adyacente.getSigAdyacente();
-                    }
-                }
-            }
-        }
-        
-        return caminoCorto;
-    }
-
     public boolean esVacio() {
         return inicio == null;
     }
@@ -509,42 +455,13 @@ public class GrafoEtiquetado {
 
     // ----------------------- METODOS PARA LAS CIUDADES ------------------------
 
-    private NodoVert ubicarCiudad(Ciudad ciudad) {
-        NodoVert aux = inicio;
-
-        if (aux != null) {
-
-            while (aux != null && ((Ciudad) aux.getElem()).compareTo(ciudad) != 0) {
-                aux = aux.getSigVertice();
-            }
-        }
-
-        return aux;
-    }
-
-    public Ciudad obtenerCiudad(Ciudad ciudad) {
-        NodoVert aux = inicio;
-        Ciudad ciudadEncontrada = null;
-
-        while (aux != null && ((Ciudad) aux.getElem()).compareTo(ciudad) != 0) {
-            aux = aux.getSigVertice();
-        }
-
-        if (aux != null) {
-            ciudadEncontrada = (Ciudad) aux.getElem();
-        }
-
-        return ciudadEncontrada;
-    }
-
-    public boolean existeCiudad(Ciudad ciudad) {
+    public boolean existeElem(Object elem) {
         boolean exito = false;
 
+        NodoVert buscado = new NodoVert(elem, null);
         NodoVert recorre = inicio;
-        String nombre = ((Ciudad) recorre.getElem()).getNombre();
 
-        while (recorre != null && !nombre.equals(ciudad.getNombre())) {
-            nombre = ((Ciudad) recorre.getElem()).getNombre();
+        while (recorre != null && !inicio.getElem().equals(elem)) {
             recorre = recorre.getSigVertice();
         }
 
@@ -555,13 +472,28 @@ public class GrafoEtiquetado {
         return exito;
     }
 
-    public Lista caminoMenorTiempo(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
+    public Object getElem(Object elem){
+        return ubicarVertice(elem).getElem();
+    }
+
+    public Lista caminoMenorTiempo(Object elemOrigen, Object elemDestino) {
         Lista actual = new Lista(), rapida = new Lista();
-        NodoVert origen = ubicarCiudad(ciudadOrigen);
-        NodoVert destino = ubicarCiudad(ciudadDestino);
+        NodoVert origen = ubicarVertice(elemOrigen);
+        NodoVert destino = ubicarVertice(elemDestino);
         int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
 
-        rapida = menorTiempoAux(origen, destino, actual, rapida, 0, tiempoMenor);
+        if(origen != null && destino != null){
+            rapida = menorTiempoAux(origen, destino, actual, rapida, 0, tiempoMenor);
+        }
+        else if(origen==null){
+            rapida.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else if(destino==null){
+            rapida.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else{
+            rapida.insertar(1, "Ninguna de las ciudades es parte del sistema");
+        }
 
         return rapida;
     }
@@ -571,13 +503,8 @@ public class GrafoEtiquetado {
 
         actual.insertar(actual.longitud() + 1, recorre.getElem());
 
-        System.out.println("Lista actual: " + actual.toString());
-        System.out.println("Lista rapida: " + rapida.toString());
-        System.out.println("Tiempo actual: " + tiempoActual + " y tiempo menor: " + tiempoMenor[0]);
-
-        if (recorre.getElem().equals(destino.getElem())) {
+        if (recorre.equals(destino)) {
             if (tiempoActual < tiempoMenor[0]) {
-                System.out.println(" ----------------- Modificacion -----------------");
                 rapida = actual.clone();
                 tiempoMenor[0] = tiempoActual;
             }
@@ -588,7 +515,7 @@ public class GrafoEtiquetado {
                 NodoVert siguienteVertice = adyacente.getVertice();
 
                 if (actual.localizar(siguienteVertice.getElem()) == -1
-                        && tiempoActual + (int) adyacente.getEtiqueta() < tiempoMenor[0] && siguienteVertice != null) {
+                        && tiempoActual + (int) adyacente.getEtiqueta() < tiempoMenor[0]) {
                     // La ciudad no esta en la lista de ciudades visitadas y la el camino es mas
                     // rapido que el almacenado
 
@@ -604,15 +531,74 @@ public class GrafoEtiquetado {
         return rapida;
     }
 
-    public Lista caminoRapidoAlt(Ciudad ciudadOrigen, Ciudad ciudadDestino, Ciudad ciudadEvitar) {
+    public Lista caminoMasCorto(Object elemOrigen, Object elemDestino){
+        Lista corto = new Lista(), actual = new Lista();
+        NodoVert origen = ubicarVertice(elemOrigen);
+        NodoVert destino = ubicarVertice(elemDestino);
+        int[] tamCorto = new int[] { Integer.MAX_VALUE };
+
+        if(origen != null && destino != null){
+            corto = caminoCortoAux(origen, destino, corto, actual, tamCorto, 0);
+        }
+        else if(origen==null){
+            corto.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else if(destino==null){
+            corto.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else{
+            corto.insertar(1, "Ninguna de las ciudades es parte del sistema");
+        }
+
+        return corto;
+    }
+
+    private Lista caminoCortoAux(NodoVert recorre, NodoVert destino, Lista corto, Lista actual, int[] tamCorto, int tamActual){
+        
+        actual.insertar(tamActual + 1, recorre.getElem());
+        tamActual++;
+
+        if(recorre.equals(destino)){
+            corto = actual.clone();
+            tamCorto[0] = tamActual;
+        }
+        else{
+            NodoAdy adyacente = recorre.getPrimerAdy();
+            while(adyacente!=null){
+                NodoVert siguienteVertice = adyacente.getVertice();
+                if(actual.localizar(siguienteVertice.getElem())<0 && tamActual+1<tamCorto[0]){
+                    corto=caminoCortoAux(siguienteVertice, destino, corto, actual, tamCorto, tamActual);
+                }
+
+                adyacente=adyacente.getSigAdyacente();
+            }
+        }
+
+        actual.eliminar(tamActual);
+
+        return corto;
+    }
+
+    public Lista caminoRapidoAlt(Object elemOrigen, Object elemDestino, Object elemEvitar) {
         Lista actual = new Lista(), rapida = new Lista();
-        NodoVert origen = ubicarCiudad(ciudadOrigen);
-        NodoVert destino = ubicarCiudad(ciudadDestino);
-        NodoVert evitar = ubicarCiudad(ciudadEvitar);
+        NodoVert origen = ubicarVertice(elemOrigen);
+        NodoVert destino = ubicarVertice(elemDestino);
+        NodoVert evitar = ubicarVertice(elemEvitar);
 
         int[] tiempoMenor = new int[] { Integer.MAX_VALUE };
 
-        rapida = menorRapidoAux(origen, destino, evitar, actual, rapida, 0, tiempoMenor);
+        if(origen != null && destino != null){
+            rapida = menorRapidoAux(origen, destino, evitar, actual, rapida, 0, tiempoMenor);
+        }
+        else if(origen==null){
+            rapida.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else if(destino==null){
+            rapida.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else{
+            rapida.insertar(1, "Ninguna de las ciudades es parte del sistema");
+        }
 
         return rapida;
     }
@@ -623,13 +609,8 @@ public class GrafoEtiquetado {
 
         actual.insertar(actual.longitud() + 1, recorre.getElem());
 
-        System.out.println("Lista actual: " + actual.toString());
-        System.out.println("Lista rapida: " + rapida.toString());
-        System.out.println("Tiempo actual: " + tiempoActual + " y tiempo menor: " + tiempoMenor[0]);
-
         if (recorre.getElem().equals(destino.getElem())) {
             if (tiempoActual < tiempoMenor[0]) {
-                System.out.println(" ----------------- Modificacion -----------------");
                 rapida = actual.clone();
                 tiempoMenor[0] = tiempoActual;
             }
@@ -657,12 +638,23 @@ public class GrafoEtiquetado {
         return rapida;
     }
 
-    public Lista caminosTotales(Ciudad ciudadOrigen, Ciudad ciudadDestino) {
+    public Lista caminosTotales(Object elemOrigen, Object elemDestino) { 
         Lista caminos = new Lista(), actual = new Lista();
-        NodoVert origen = ubicarCiudad(ciudadOrigen);
-        NodoVert destino = ubicarCiudad(ciudadDestino);
+        NodoVert origen = ubicarVertice(elemOrigen);
+        NodoVert destino = ubicarVertice(elemDestino);
 
-        caminos = totalesAux(origen, destino, caminos, actual);
+        if(origen != null && destino != null){
+            caminos = totalesAux(origen, destino, caminos, actual);
+        }
+        else if(origen==null){
+            caminos.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else if(destino==null){
+            caminos.insertar(1, "La ciudad origen no es parte del sistema");
+        }
+        else{
+            caminos.insertar(1, "Ninguna de las ciudades es parte del sistema");
+        }
 
         return caminos;
     }

@@ -17,7 +17,7 @@ public class MapeoAMuchos {
         return Math.abs(valorDominio.toString().hashCode()) % TAM;
     }
 
-    public boolean insertar(Object valorDominio, Object valorRango) {
+    /*public boolean insertar(Object valorDominio, Object valorRango) {
         boolean encontrado = false;
 
         int pos = hash(valorDominio);
@@ -34,10 +34,9 @@ public class MapeoAMuchos {
         }
 
         return !encontrado;
-    }
+    }*/
 
     public boolean asociar(Object valorDominio, Object valorRango) {
-        boolean exito = false;
 
         int pos = hash(valorDominio);
 
@@ -55,17 +54,15 @@ public class MapeoAMuchos {
         if (encontrado) {
             Lista listaRango = aux.getRango();
             listaRango.insertar(listaRango.longitud() + 1, valorRango);
-            exito = true;
         }
         else{
             tabla[pos] = new NodoHashMapeoM(valorDominio, tabla[pos]);
             Lista rango = tabla[pos].getRango();
-            rango.insertar(rango.longitud() + 1, valorRango);
+            rango.insertar(rango.longitud() + 1, valorRango); // sacar afuera
             cant++;
-            exito = true;
         }
 
-        return exito;
+        return true;
     }
 
     public boolean desasociar(Object valorDominio, Object valorRango) {
@@ -98,7 +95,7 @@ public class MapeoAMuchos {
                 }
             }
         }
-
+        
         return exito;
     }
 

@@ -1,7 +1,5 @@
 package Estructuras;
 
-import TDAs.Ciudad;
-
 public class Lista {
     
     
@@ -295,29 +293,6 @@ public class Lista {
         }
         
         return mensaje;
-    }
-    
-    // -------------------- Metodos para Ciudad -----------------------
-
-    public boolean tieneAlojamiento(){
-        boolean exito = false;
-        Nodo aux = cabecera.getEnlace();
-
-        //System.out.println(" --------------- entra al metodo --------------- ");
-        //System.out.println("La ciudad actual es distinto de null: "+ (aux != null));
-
-        while(!exito && aux!=null){
-            //System.out.println(" ---------------- entro while ---------------- ");
-            Ciudad actual = (Ciudad) aux.getElem();
-
-            if(actual.getDisponibilidad()){
-                exito=true;
-            }
-            
-            aux = aux.getEnlace();
-        }
-        
-        return exito;
     }
     
 }

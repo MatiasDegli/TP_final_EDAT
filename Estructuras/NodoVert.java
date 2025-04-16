@@ -42,4 +42,10 @@ public class NodoVert {
         primerAdy=ady;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        NodoVert otro = (NodoVert) obj;  
+        return this.elem == otro.elem;
+    }
+
 }
